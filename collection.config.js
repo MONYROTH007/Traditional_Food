@@ -14,10 +14,10 @@ const collection = {
   description: "A living archive of a piece of Khmer culture, built for ICT 340.",
 
   // Who is building this archive? Your name, as you want it shown.
-  curator: "Your Name",
+  curator: "Nguon Monyroth",
 
   // Where does your knowledge come from? A person, a place, a community.
-  source: "To be gathered",
+  source: "Community elders, grandmothers, and local market vendors.",
 };
 
 export default collection;
