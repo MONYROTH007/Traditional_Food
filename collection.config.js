@@ -8,7 +8,7 @@
 
 const collection = {
   // What does your archive collect? e.g. "Khmer Proverbs"
-  name: "Cambodian Traditional Recipes",
+  name: "Traditional Khmer Recipes",
 
   // One sentence: what is this archive, and why does it matter?
   description: "This archive would collect oral histories, traditional family recipes, and rare photographs documenting the everyday culinary heritage and indigenous cooking methods of rural Khmer home cooks.",
