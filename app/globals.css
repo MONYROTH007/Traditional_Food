@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --tw-krama-a: #a63d34;
+  --tw-krama-b: #f2e9d8;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #0f2a24;
+  color: #f2e9d8;
+}
+
+::selection {
+  background-color: #c9a227;
+  color: #0b1512;
+}
+
+/* Krama (checkered scarf) weave pattern used as the site's signature motif */
+.krama-weave {
+  background-image: repeating-linear-gradient(
+      45deg,
+      rgba(242, 233, 216, 0.9) 0px,
+      rgba(242, 233, 216, 0.9) 6px,
+      rgba(166, 61, 52, 0.9) 6px,
+      rgba(166, 61, 52, 0.9) 12px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(242, 233, 216, 0.9) 0px,
+      rgba(242, 233, 216, 0.9) 6px,
+      rgba(166, 61, 52, 0.9) 6px,
+      rgba(166, 61, 52, 0.9) 12px
+    );
+  background-blend-mode: multiply;
+}
+
+.krama-divider {
+  background-image: repeating-linear-gradient(
+    90deg,
+    #a63d34 0px,
+    #a63d34 14px,
+    #f2e9d8 14px,
+    #f2e9d8 28px
+  );
+  height: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Custom scrollbar for the horizontal dish rail */
+.rail::-webkit-scrollbar {
+  height: 6px;
+}
+.rail::-webkit-scrollbar-thumb {
+  background-color: #c9a227;
+  border-radius: 999px;
+}
+.rail::-webkit-scrollbar-track {
+  background-color: rgba(242, 233, 216, 0.08);
+}

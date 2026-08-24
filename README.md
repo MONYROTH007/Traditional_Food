@@ -1,36 +1,63 @@
-# Khmer Living Archive — starter
+# Nhoam Khmer — Traditional Khmer Foods
 
-This is the starting point for your ICT 340 capstone: a community archive that preserves a piece of Khmer culture. Right now it's one page. By December it will browse, search, take contributions, and publish reviewed entries. Same skeleton for everyone; the collection is yours.
+An interactive, responsive guide to five traditional Cambodian dishes, built
+with Next.js 14 (App Router) and Tailwind CSS.
 
-## Lab 1: get this live
+## What's inside
 
-Follow the Lab 1 guide on Canvas. The short version:
+- **5 real dishes** with original descriptions, ingredients, meal time,
+  region of origin in Cambodia, and a source link for further reading:
+  Fish Amok, Khmer Noodles (Num Banh Chok), Pork & Rice (Bai Sach Chrouk),
+  Noodle Soup (Kuy Teav), and Beef Lok Lak.
+- **Placeholder dish art** — generated SVG/CSS artwork (no external image
+  files needed) standing in for real photography.
+- **Interactive gallery** — filter by meal time, scroll the dish rail, and
+  tap any dish to load its full detail panel.
+- **Custom visual identity** — a palette drawn from Khmer rice paddies,
+  temple gold, and Kampot brick-red, with a krama (checkered scarf) weave
+  pattern used as the site's signature motif.
+- Fully responsive: horizontal swipe rail on mobile, side-by-side layout
+  on desktop.
 
-1. Click **Use this template** (top right) → **Create a new repository**. Name it after your archive.
-2. Go to [vercel.com](https://vercel.com), sign in with GitHub, **Add New → Project**, import your new repository, and click **Deploy**.
-3. Clone your repo, open it in VS Code, edit `collection.config.js` (the only file you touch today), then commit and push:
-
-   ```bash
-   git clone https://github.com/YOUR-USERNAME/YOUR-REPO-NAME.git
-   cd YOUR-REPO-NAME
-   code .
-   # edit collection.config.js, then:
-   git add .
-   git commit -m "make it mine"
-   git push
-   ```
-
-4. Watch Vercel redeploy on its own, then submit your live URL to the Lab 1 assignment on Canvas.
-
-## Running it locally (optional today, needed from week 2)
+## Getting started
 
 ```bash
 npm install
 npm run dev
 ```
 
-Then open http://localhost:3000.
+Open [http://localhost:3000](http://localhost:3000).
 
-## Rules of the road
+## Build for production
 
-You own what you ship. Every line that lands in this repository is yours to explain, whoever or whatever wrote it.
+```bash
+npm run build
+npm run start
+```
+
+## Project structure
+
+```
+app/
+  layout.tsx       Root layout + metadata
+  page.tsx          Assembles Hero, FoodGallery, Footer
+  globals.css       Krama pattern, scrollbar, motion-reduction rules
+components/
+  Hero.tsx
+  FoodGallery.tsx   Filter tabs + rail + detail panel (client component)
+  DishArt.tsx       SVG placeholder artwork per dish
+  KramaDivider.tsx  Signature checkered-weave divider
+  Footer.tsx
+data/
+  foods.ts          The 5 dish entries (edit here to add more)
+```
+
+## Notes
+
+- Fonts use a system font stack (Georgia/Palatino-family for display,
+  system sans for body) so the project builds and looks good with zero
+  external network calls. If you want branded fonts, swap in `next/font`
+  with your choice of typeface.
+- Dish images are placeholder SVG art, not real photography — swap
+  `DishArt.tsx` for `next/image` with real photos when you have licensed
+  images to use.
