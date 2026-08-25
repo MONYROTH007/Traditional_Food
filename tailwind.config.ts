@@ -2,81 +2,36 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./lib/**/*.{ts,tsx}"
   ],
   theme: {
     extend: {
       colors: {
-        paddy: {
-          DEFAULT: "#0F2A24",
-          light: "#16382F",
-          deep: "#081C17",
-        },
-        gold: {
-          DEFAULT: "#C9A227",
-          bright: "#E4C34F",
-          dim: "#8A6E1B",
-        },
-        brick: {
-          DEFAULT: "#A63D34",
-          light: "#C25646",
-        },
-        sage: {
-          DEFAULT: "#7C9473",
-          light: "#A9BE9E",
-        },
-        rice: "#F2E9D8",
-        ink: "#0B1512",
+        ink: "#1C2418",
+        "ink-soft": "#26301F",
+        paper: "#F3ECD9",
+        "paper-deep": "#E8DEC0",
+        turmeric: "#D9A441",
+        "turmeric-deep": "#B9832A",
+        clay: "#A9462A",
+        "clay-deep": "#8B3821",
+        krama: "#2E4057",
+        umber: "#3A2E22",
+        leaf: "#4B5D3A"
       },
       fontFamily: {
-        display: [
-          "Georgia",
-          '"Iowan Old Style"',
-          '"Palatino Linotype"',
-          '"URW Palladio L"',
-          "P052",
-          "serif",
-        ],
-        body: [
-          "-apple-system",
-          "BlinkMacSystemFont",
-          '"Segoe UI"',
-          "Roboto",
-          '"Helvetica Neue"',
-          "Arial",
-          "sans-serif",
-        ],
-        mono: [
-          "ui-monospace",
-          "SFMono-Regular",
-          "Menlo",
-          "Consolas",
-          '"Liberation Mono"',
-          "monospace",
-        ],
+        display: ["Fraunces", "serif"],
+        body: ["Work Sans", "sans-serif"],
+        mono: ["IBM Plex Mono", "monospace"]
       },
-      backgroundImage: {
-        krama:
-          "repeating-conic-gradient(from 0deg, var(--tw-krama-a) 0deg 90deg, var(--tw-krama-b) 90deg 180deg)",
-      },
-      keyframes: {
-        rise: {
-          "0%": { opacity: "0", transform: "translateY(16px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        steam: {
-          "0%": { opacity: "0", transform: "translateY(0) scaleX(1)" },
-          "50%": { opacity: "0.6" },
-          "100%": { opacity: "0", transform: "translateY(-22px) scaleX(1.4)" },
-        },
-      },
-      animation: {
-        rise: "rise 0.7s cubic-bezier(0.16,1,0.3,1) both",
-        steam: "steam 2.8s ease-in-out infinite",
-      },
-    },
+      maxWidth: {
+        content: "1180px"
+      }
+    }
   },
-  plugins: [],
+  plugins: []
 };
+
 export default config;

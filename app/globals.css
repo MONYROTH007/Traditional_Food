@@ -3,73 +3,103 @@
 @tailwind utilities;
 
 :root {
-  --tw-krama-a: #a63d34;
-  --tw-krama-b: #f2e9d8;
+  --ink: #1c2418;
+  --ink-soft: #26301f;
+  --paper: #f3ecd9;
+  --paper-deep: #e8dec0;
+  --turmeric: #d9a441;
+  --turmeric-deep: #b9832a;
+  --clay: #a9462a;
+  --krama: #2e4057;
+  --umber: #3a2e22;
+  --leaf: #4b5d3a;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 html {
   scroll-behavior: smooth;
 }
 
-body {
-  background-color: #0f2a24;
-  color: #f2e9d8;
-}
-
-::selection {
-  background-color: #c9a227;
-  color: #0b1512;
-}
-
-/* Krama (checkered scarf) weave pattern used as the site's signature motif */
-.krama-weave {
-  background-image: repeating-linear-gradient(
-      45deg,
-      rgba(242, 233, 216, 0.9) 0px,
-      rgba(242, 233, 216, 0.9) 6px,
-      rgba(166, 61, 52, 0.9) 6px,
-      rgba(166, 61, 52, 0.9) 12px
-    ),
-    repeating-linear-gradient(
-      -45deg,
-      rgba(242, 233, 216, 0.9) 0px,
-      rgba(242, 233, 216, 0.9) 6px,
-      rgba(166, 61, 52, 0.9) 6px,
-      rgba(166, 61, 52, 0.9) 12px
-    );
-  background-blend-mode: multiply;
-}
-
-.krama-divider {
-  background-image: repeating-linear-gradient(
-    90deg,
-    #a63d34 0px,
-    #a63d34 14px,
-    #f2e9d8 14px,
-    #f2e9d8 28px
-  );
-  height: 6px;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
+  html {
+    scroll-behavior: auto;
+  }
+  * {
+    animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
+    transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
 }
 
-/* Custom scrollbar for the horizontal dish rail */
-.rail::-webkit-scrollbar {
-  height: 6px;
+body {
+  background-color: var(--paper);
+  color: var(--umber);
+  font-family: "Work Sans", ui-sans-serif, system-ui, sans-serif;
 }
-.rail::-webkit-scrollbar-thumb {
-  background-color: #c9a227;
+
+/* ---- Market tag: the signature element ---- */
+.market-tag {
+  position: relative;
+  background: var(--paper);
+  color: var(--umber);
+  clip-path: polygon(
+    0% 8px, 4% 0%, 96% 0%, 100% 8px,
+    100% calc(100% - 10px), 92% 100%, 8% 100%, 0% calc(100% - 10px)
+  );
+  box-shadow: 0 6px 16px rgba(28, 36, 24, 0.25);
+}
+
+.market-tag::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 22px;
   border-radius: 999px;
+  background: var(--paper);
+  box-shadow: inset 0 0 0 2px var(--paper-deep);
 }
-.rail::-webkit-scrollbar-track {
-  background-color: rgba(242, 233, 216, 0.08);
+
+.stitch-line {
+  background-image: linear-gradient(
+    to right,
+    var(--turmeric) 0,
+    var(--turmeric) 6px,
+    transparent 6px,
+    transparent 14px
+  );
+  background-size: 14px 2px;
+  background-repeat: repeat-x;
+  background-position: left center;
+  height: 2px;
+}
+
+/* Reveal-on-scroll utility */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.font-display {
+  font-family: "Fraunces", ui-serif, Georgia, serif;
+}
+
+.font-mono-tag {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+.texture-grain {
+  background-image: radial-gradient(rgba(58, 46, 34, 0.06) 1px, transparent 1px);
+  background-size: 3px 3px;
 }
