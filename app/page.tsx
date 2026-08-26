@@ -41,7 +41,7 @@ export default function Home() {
           <Reveal>
             <div className="flex items-end justify-between flex-wrap gap-4 mb-10 md:mb-14">
               <h2 className="font-display text-3xl md:text-4xl text-umber">
-                Menu
+                Today's Menu
               </h2>
               <p className="font-mono-tag text-[11px] tracking-widest uppercase text-umber/50">
                  dishes · Battambang
