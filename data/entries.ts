@@ -65,7 +65,7 @@ export const initialEntries: ArchiveEntry[] = [
     description:
       "Fresh river fish fillet baked in banana leaves with lemongrass kroeung paste, rich coconut cream, and noni leaves (ស្លឹកញ).",
     recordedDate: "August 2026",
-    imageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80",
+    imageUrl: "#",
   },
   {
     id: "007",
@@ -76,7 +76,7 @@ export const initialEntries: ArchiveEntry[] = [
     description:
       "Nutritious Khmer soup simmered with roasted ground rice, green banana, pumpkin, eggplant, green papaya, and catfish.",
     recordedDate: "August 2026",
-    imageUrl: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80",
+    imageUrl: "#",
   },
   {
     id: "008",
@@ -87,7 +87,7 @@ export const initialEntries: ArchiveEntry[] = [
     description:
       "Rich coconut chicken curry slow-cooked with sweet potatoes, onions, red kroeung paste, and served with crisp baguettes or rice.",
     recordedDate: "September 2026",
-    imageUrl: "https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?auto=format&fit=crop&w=800&q=80",
+    imageUrl: "#",
   },
   {
     id: "009",
@@ -98,6 +98,6 @@ export const initialEntries: ArchiveEntry[] = [
     description:
       "Marinated grilled pork strips served over jasmine rice with pickled daikon, cucumber slices, scallion oil, and clear broth.",
     recordedDate: "September 2026",
-    imageUrl: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=800&q=80",
+    imageUrl: "#",
   },
 ];

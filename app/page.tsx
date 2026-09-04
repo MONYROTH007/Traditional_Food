@@ -6,7 +6,7 @@ import EntryGrid from "../components/EntryGrid";
 import AboutSection from "../components/AboutSection";
 import ContactSection from "../components/ContactSection";
 import UploadModal from "../components/UploadModal";
-import { initialEntries } from "../data/sampleEntries";
+import { initialEntries } from "../data/entries";
 import { ArchiveEntry, NavTab } from "../types";
 
 export default function Home() {
