@@ -1,28 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+"use client";
+
 import { useState } from "react";
 
 import { SiteChrome } from "@/components/SiteChrome";
 
-export const Route = createFileRoute("/contact")({
-  head: () => ({
-    meta: [
-      { title: "Contact — Traditional Khmer Recipes" },
-      {
-        name: "description",
-        content:
-          "Share a family Khmer recipe from Battambang province or ask a question about the dishes on this site.",
-      },
-      { property: "og:title", content: "Contact — Traditional Khmer Recipes" },
-      {
-        property: "og:description",
-        content: "Share a family recipe from Battambang or ask about a dish.",
-      },
-    ],
-  }),
-  component: ContactPage,
-});
-
-function ContactPage() {
+export default function ContactPage() {
   const [sent, setSent] = useState(false);
 
   return (
@@ -48,18 +30,14 @@ function ContactPage() {
             }}
           >
             <label className="block">
-              <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                Name
-              </span>
+              <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Name</span>
               <input
                 required
                 className="mt-2 w-full rounded-sm border border-border bg-card px-3 py-2 text-sm outline-none focus:border-primary"
               />
             </label>
             <label className="block">
-              <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                Email
-              </span>
+              <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Email</span>
               <input
                 type="email"
                 required

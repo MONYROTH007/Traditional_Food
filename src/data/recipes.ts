@@ -41,7 +41,7 @@ export const recipes: Recipe[] = [
     place: "Roadside stalls on National Road 5",
     time: "1 hr 30 min",
     note: "Sticky rice, black beans and coconut milk packed into a bamboo tube and roasted slowly over charcoal until the bamboo blackens.",
-    image: kralan,
+    image: kralan.src,
   },
   {
     id: "amok-trey",
@@ -51,7 +51,7 @@ export const recipes: Recipe[] = [
     place: "Sangkae riverside kitchens",
     time: "45 min",
     note: "Freshwater fish folded into coconut cream and yellow kroeung, then steamed in a banana leaf cup until it sets like a custard.",
-    image: amok,
+    image: amok.src,
   },
   {
     id: "samlor-machu-kroeung",
@@ -61,7 +61,7 @@ export const recipes: Recipe[] = [
     place: "Ek Phnom village homes",
     time: "1 hr",
     note: "A sour lemongrass soup with beef and tamarind, seasoned with prahok and finished with a handful of bitter herbs.",
-    image: machuKroeung,
+    image: machuKroeung.src,
   },
   {
     id: "num-banh-chok",
@@ -71,7 +71,7 @@ export const recipes: Recipe[] = [
     place: "Psar Nath morning market",
     time: "2 hr",
     note: "Fermented rice noodles under a green fish gravy of lemongrass and turmeric, eaten at dawn with banana blossom and cucumber.",
-    image: numBanhChok,
+    image: numBanhChok.src,
   },
   {
     id: "prahok-ktis",
@@ -81,7 +81,7 @@ export const recipes: Recipe[] = [
     place: "Battambang town family tables",
     time: "35 min",
     note: "Minced pork simmered with prahok, coconut cream and kroeung into a thick dip for raw eggplant, cabbage and long beans.",
-    image: prahokKtis,
+    image: prahokKtis.src,
   },
   {
     id: "samlor-korko",
@@ -91,7 +91,7 @@ export const recipes: Recipe[] = [
     place: "Rice fields of Bavel district",
     time: "1 hr 15 min",
     note: "The old harvest soup: whatever the garden gives, thickened with toasted ground rice and a spoon of prahok.",
-    image: samlorKorko,
+    image: samlorKorko.src,
   },
   {
     id: "num-krok",
@@ -101,7 +101,7 @@ export const recipes: Recipe[] = [
     place: "Evening stalls near the Bamboo Train",
     time: "30 min",
     note: "Coconut rice batter poured into a dimpled iron pan over coals, crisp at the edge and soft as cream inside.",
-    image: numKrok,
+    image: numKrok.src,
   },
   {
     id: "cha-kroeung-sach-ko",
@@ -111,7 +111,7 @@ export const recipes: Recipe[] = [
     place: "Moung Ruessei roadside eateries",
     time: "25 min",
     note: "Beef stir fried hard and fast with hand pounded lemongrass paste, kaffir lime leaf and a little palm sugar.",
-    image: chaKroeung,
+    image: chaKroeung.src,
   },
   {
     id: "bai-sach-chrouk",
@@ -121,6 +121,6 @@ export const recipes: Recipe[] = [
     place: "Street corners around Psar Boeung Chhouk",
     time: "40 min",
     note: "Coconut marinated pork grilled over charcoal, served on broken rice with pickles and a bowl of clear broth.",
-    image: baiSachChrouk,
+    image: baiSachChrouk.src,
   },
 ];

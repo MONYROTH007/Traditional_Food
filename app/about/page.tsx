@@ -1,34 +1,23 @@
-import { createFileRoute } from "@tanstack/react-router";
+import type { Metadata } from "next";
 
 import { SiteChrome } from "@/components/SiteChrome";
 
-export const Route = createFileRoute("/about")({
-  head: () => ({
-    meta: [
-      { title: "About — Traditional Khmer Recipes" },
-      {
-        name: "description",
-        content:
-          "Why we collect the old Khmer recipes of Battambang province and how each dish was recorded.",
-      },
-      { property: "og:title", content: "About — Traditional Khmer Recipes" },
-      {
-        property: "og:description",
-        content: "How the old Khmer recipes of Battambang province were collected.",
-      },
-    ],
-  }),
-  component: AboutPage,
-});
+export const metadata: Metadata = {
+  title: "About",
+  description:
+    "Why we collect the old Khmer recipes of Battambang province and how each dish was recorded.",
+  openGraph: {
+    title: "About — Traditional Khmer Recipes",
+    description: "How the old Khmer recipes of Battambang province were collected.",
+  },
+};
 
-function AboutPage() {
+export default function AboutPage() {
   return (
     <SiteChrome>
       <div className="mx-auto w-full max-w-2xl px-5 py-12">
         <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">About</p>
-        <h1 className="mt-2 font-display text-3xl text-primary sm:text-4xl">
-          Kept in the family
-        </h1>
+        <h1 className="mt-2 font-display text-3xl text-primary sm:text-4xl">Kept in the family</h1>
         <div className="mt-6 space-y-5 text-sm leading-7 text-muted-foreground">
           <p>
             Battambang has fed Cambodia for generations. Its rice fields, its river and its old

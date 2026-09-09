@@ -1,35 +1,27 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import type { Metadata } from "next";
+import Link from "next/link";
 
 import hero from "@/assets/hero-battambang.jpg";
 import { RecipeCard } from "@/components/RecipeCard";
 import { SiteChrome } from "@/components/SiteChrome";
 import { recipes } from "@/data/recipes";
 
-export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Traditional Khmer Recipes of Battambang" },
-      {
-        name: "description",
-        content:
-          "Nine traditional Khmer recipes kept by families of Battambang province, Cambodia — kralan, amok trey, samlor korko and more.",
-      },
-      { property: "og:title", content: "Traditional Khmer Recipes of Battambang" },
-      {
-        property: "og:description",
-        content: "Nine old Khmer dishes from the villages and markets of Battambang province.",
-      },
-    ],
-  }),
-  component: Home,
-});
+export const metadata: Metadata = {
+  title: "Traditional Khmer Recipes of Battambang",
+  description:
+    "Nine traditional Khmer recipes kept by families of Battambang province, Cambodia — kralan, amok trey, samlor korko and more.",
+  openGraph: {
+    title: "Traditional Khmer Recipes of Battambang",
+    description: "Nine old Khmer dishes from the villages and markets of Battambang province.",
+  },
+};
 
-function Home() {
+export default function HomePage() {
   return (
     <SiteChrome>
       <section className="relative">
         <img
-          src={hero}
+          src={hero.src}
           alt="Golden hour over old shophouses and rice fields in Battambang, Cambodia"
           width={1600}
           height={900}
@@ -46,7 +38,7 @@ function Home() {
               Nine dishes from Battambang province, written the way they were taught at the table.
             </p>
             <Link
-              to="/recipes"
+              href="/recipes"
               className="mt-7 inline-block rounded-sm bg-primary px-6 py-3 text-xs uppercase tracking-[0.25em] text-primary-foreground"
             >
               See the recipes
@@ -59,7 +51,7 @@ function Home() {
         <div className="flex items-end justify-between border-b border-border pb-4">
           <h2 className="font-display text-2xl text-primary">Begin with three</h2>
           <Link
-            to="/recipes"
+            href="/recipes"
             className="text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-primary"
           >
             All nine

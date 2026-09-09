@@ -1,35 +1,17 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+"use client";
+
 import { Search, X, RotateCcw } from "lucide-react";
+import { useMemo, useState } from "react";
 
 import { RecipeCard } from "@/components/RecipeCard";
 import { SiteChrome } from "@/components/SiteChrome";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { recipes, RECIPE_CATEGORIES, type RecipeCategory } from "@/data/recipes";
-
-export const Route = createFileRoute("/recipes")({
-  head: () => ({
-    meta: [
-      { title: "Nine Khmer Recipes from Battambang" },
-      {
-        name: "description",
-        content:
-          "Nine traditional Khmer recipes from Battambang province: kralan, amok trey, samlor korko, num banh chok and more.",
-      },
-      { property: "og:title", content: "Nine Khmer Recipes from Battambang" },
-      {
-        property: "og:description",
-        content: "Kralan, amok trey, samlor korko and other dishes of Battambang province.",
-      },
-    ],
-  }),
-  component: RecipesPage,
-});
+import { Input } from "@/components/ui/input";
+import { recipes, RECIPE_CATEGORIES } from "@/data/recipes";
 
 const PER_PAGE = 6;
 
-function RecipesPage() {
+export default function RecipesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [page, setPage] = useState(1);
@@ -38,8 +20,7 @@ function RecipesPage() {
 
   const filteredRecipes = useMemo(() => {
     return recipes.filter((r) => {
-      const matchesCategory =
-        selectedCategory === "All" || r.category === selectedCategory;
+      const matchesCategory = selectedCategory === "All" || r.category === selectedCategory;
 
       const q = searchQuery.trim().toLowerCase();
       const matchesQuery =
@@ -84,7 +65,6 @@ function RecipesPage() {
           province.
         </p>
 
-        {/* Search & Category Filter Section */}
         <div className="mt-8 flex flex-col gap-5 border-y border-border py-6">
           <div className="relative max-w-md w-full">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
@@ -107,7 +87,6 @@ function RecipesPage() {
             )}
           </div>
 
-          {/* Category Filter Pills */}
           <div className="flex flex-wrap items-center gap-2">
             <span className="mr-1 text-xs uppercase tracking-wider text-muted-foreground font-medium">
               Category:
@@ -132,7 +111,6 @@ function RecipesPage() {
           </div>
         </div>
 
-        {/* Results grid or empty state */}
         {filteredRecipes.length > 0 ? (
           <>
             <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -184,7 +162,8 @@ function RecipesPage() {
 
             <p className="mt-6 text-center text-xs uppercase tracking-[0.2em] text-muted-foreground">
               {totalPages > 1 ? `Page ${safePage} of ${totalPages} · ` : ""}
-              {shown.length} of {filteredRecipes.length} matching dish{filteredRecipes.length === 1 ? "" : "es"}
+              {shown.length} of {filteredRecipes.length} matching dish
+              {filteredRecipes.length === 1 ? "" : "es"}
               {filteredRecipes.length !== recipes.length && ` (filtered from ${recipes.length})`}
             </p>
           </>
