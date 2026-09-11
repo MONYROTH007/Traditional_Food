@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import hero from "@/assets/hero-battambang.jpg";
+import hero from "@/assets/num-banh-chok.jpg";
 import { RecipeCard } from "@/components/RecipeCard";
 import { SiteChrome } from "@/components/SiteChrome";
 import { recipes } from "@/data/recipes";

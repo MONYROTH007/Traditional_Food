@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="576" viewBox="0 0 768 576" role="img" aria-label="Dish photo coming soon">
+  <rect width="768" height="576" fill="#f5f0eb"/>
+  <rect x="48" y="48" width="672" height="480" rx="8" fill="#ebe4dc" stroke="#d4c9be" stroke-width="2"/>
+  <circle cx="384" cy="240" r="56" fill="#d4c9be"/>
+  <path d="M352 260h64v8h-64z" fill="#c4b8ab"/>
+  <text x="384" y="360" text-anchor="middle" fill="#8a7f74" font-family="system-ui, sans-serif" font-size="22">Photo coming soon</text>
+</svg>
