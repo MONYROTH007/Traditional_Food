@@ -45,15 +45,17 @@ export default function SignupPage() {
 
     try {
       const supabase = createClient();
-      const { error: authError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            username: username.trim(),
+      const { data: signUpData, error: authError } = await supabase.auth.signUp(
+        {
+          email,
+          password,
+          options: {
+            data: {
+              username: username.trim(),
+            },
           },
         },
-      });
+      );
 
       if (authError) {
         setError(authError.message);
@@ -61,15 +63,26 @@ export default function SignupPage() {
         return;
       }
 
-      // Explicitly sign out so the newly registered user must log in manually
-      await supabase.auth.signOut();
+      // If sign up didn't automatically attach a session, sign in directly with credentials
+      if (!signUpData?.session) {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (signInError) {
+          setError(signInError.message);
+          setLoading(false);
+          return;
+        }
+      }
 
-      setSuccess("Account created successfully! Redirecting to login page...");
+      setSuccess("Account created successfully! Auto logging in...");
       setLoading(false);
 
       setTimeout(() => {
-        router.push("/login");
-      }, 1500);
+        router.push("/");
+        router.refresh();
+      }, 1000);
     } catch (err: unknown) {
       setError(
         err instanceof Error ? err.message : "An unexpected error occurred",

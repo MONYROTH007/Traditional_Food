@@ -1,24 +1,47 @@
-import type { Metadata } from "next";
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Utensils, HeartHandshake, Flame } from "lucide-react";
 
 import hero from "@/assets/num-banh-chok.jpg";
 import { RecipeCard } from "@/components/RecipeCard";
 import { SiteChrome } from "@/components/SiteChrome";
-import { recipes } from "@/data/recipes";
-
-export const metadata: Metadata = {
-  title: "Traditional Khmer Recipes of Battambang",
-  description:
-    "Nine traditional Khmer recipes kept by families of Battambang province, Cambodia — kralan, amok trey, samlor korko and more.",
-  openGraph: {
-    title: "Traditional Khmer Recipes of Battambang",
-    description:
-      "Nine old Khmer dishes from the villages and markets of Battambang province.",
-  },
-};
+import type { Recipe } from "@/data/recipes";
+import { createClient } from "@/utils/supabase/client";
+import { mapEntryToRecipe, type EntryRow } from "@/utils/entries";
 
 export default function HomePage() {
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchEntries() {
+      try {
+        setLoading(true);
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from("entries")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching entries for home page:", error);
+          setRecipes([]);
+        } else if (data) {
+          setRecipes(data.map((row: EntryRow) => mapEntryToRecipe(row)));
+        }
+      } catch (err) {
+        console.error("Failed to fetch entries:", err);
+        setRecipes([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchEntries();
+  }, []);
+
   return (
     <SiteChrome>
       <section className="relative">
@@ -59,17 +82,44 @@ export default function HomePage() {
             href="/recipes"
             className="text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-primary"
           >
-            All nine
+            All dishes
           </Link>
         </div>
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {recipes.slice(0, 3).map((r) => (
-            <RecipeCard key={r.id} recipe={r} />
-          ))}
-        </div>
+
+        {loading ? (
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="animate-pulse rounded-sm border border-border bg-card p-5"
+              >
+                <div className="h-48 w-full rounded-sm bg-muted" />
+                <div className="mt-4 h-4 w-1/3 rounded bg-muted" />
+                <div className="mt-2 h-6 w-2/3 rounded bg-muted" />
+                <div className="mt-3 h-10 w-full rounded bg-muted" />
+              </div>
+            ))}
+          </div>
+        ) : recipes.length > 0 ? (
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {recipes.slice(0, 3).map((r) => (
+              <RecipeCard key={r.id} recipe={r} />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-8 flex flex-col items-center justify-center rounded-sm border border-dashed border-border p-12 text-center">
+            <Utensils className="h-8 w-8 text-muted-foreground" />
+            <h3 className="mt-4 font-display text-xl text-primary">
+              No entries yet
+            </h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              No traditional food entries found in the database.
+            </p>
+          </div>
+        )}
       </section>
 
-      {/* Redesigned About Section - Matched to max-w-5xl Grid Alignment & Card Styling */}
+      {/* Redesigned About Section */}
       <section className="border-t border-border bg-card/30 py-16">
         <div className="mx-auto w-full max-w-5xl px-5">
           <div className="flex flex-col justify-between border-b border-border pb-4 sm:flex-row sm:items-end">

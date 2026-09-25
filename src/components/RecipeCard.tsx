@@ -24,7 +24,13 @@ import {
 } from "@/components/ui/dialog";
 import { createClient } from "@/utils/supabase/client";
 
-export function RecipeCard({ recipe }: { recipe: Recipe }) {
+export function RecipeCard({
+  recipe,
+  requiresAuth = false,
+}: {
+  recipe: Recipe;
+  requiresAuth?: boolean;
+}) {
   const router = useRouter();
   const [user, setUser] = useState<unknown | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
@@ -47,8 +53,10 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
     };
   }, []);
 
+  const isLocked = requiresAuth && !user;
+
   const handleCardClick = () => {
-    if (user) {
+    if (!isLocked) {
       setDetailOpen(true);
     } else {
       setAuthPromptOpen(true);
@@ -79,7 +87,7 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
             </Badge>
           )}
 
-          {!user && (
+          {isLocked && (
             <div className="absolute top-3 left-3 flex items-center gap-1.5 rounded-full border border-border/80 bg-background/90 px-2.5 py-1 text-[10px] font-medium tracking-wider uppercase text-muted-foreground backdrop-blur-sm">
               <Lock className="h-3 w-3 text-accent" />
               <span>Login to view</span>
@@ -109,14 +117,18 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
 
           <div className="mt-4 flex items-center justify-between border-t border-border/50 pt-2 text-xs font-medium text-primary">
             <span className="uppercase tracking-wider">
-              {user ? "View Recipe Details" : "Login Required"}
+              {isLocked ? "Login Required" : "View Recipe Details"}
             </span>
-            <BookOpen className="h-3.5 w-3.5" />
+            {isLocked ? (
+              <Lock className="h-3.5 w-3.5 text-accent" />
+            ) : (
+              <BookOpen className="h-3.5 w-3.5" />
+            )}
           </div>
         </div>
       </article>
 
-      {/* 1. Full Recipe Details Modal (For Logged-in Users) */}
+      {/* 1. Full Recipe Details Modal */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
         <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto border-border bg-card p-0 sm:rounded-md">
           <div className="relative">
@@ -222,7 +234,7 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
               <strong className="text-foreground">
                 {recipe.name} ({recipe.khmer})
               </strong>{" "}
-              are exclusive to registered users.
+              on Page 2 and beyond are reserved for registered users.
             </DialogDescription>
           </DialogHeader>
 
@@ -232,7 +244,7 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
             </p>
             <p className="text-muted-foreground">
               Please log in to your account or create a new account to unlock
-              all 9 heritage recipes.
+              all heritage recipes across all pages.
             </p>
           </div>
 
