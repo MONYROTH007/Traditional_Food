@@ -116,5 +116,6 @@ export function mapEntryToRecipe(entry: EntryRow): Recipe {
     image: resolvePhotoUrl(entry.photo_url),
     ingredients: ingredientsList,
     instructions: instructionsList,
+    owner: entry.owner ?? null,
   };
 }

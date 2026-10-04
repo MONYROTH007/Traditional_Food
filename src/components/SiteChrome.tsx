@@ -11,6 +11,7 @@ import { createClient } from "@/utils/supabase/client";
 const links = [
   { href: "/", label: "Home", exact: true },
   { href: "/recipes", label: "Recipes", exact: false },
+  { href: "/contribute", label: "Contribute", exact: false },
 ] as const;
 
 function isActive(pathname: string, href: string, exact: boolean) {

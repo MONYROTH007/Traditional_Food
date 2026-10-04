@@ -30,6 +30,7 @@ export type Recipe = {
   image: string;
   ingredients: string[];
   instructions: string[];
+  owner?: string | null;
 };
 
 export const recipes: Recipe[] = [

@@ -10,6 +10,8 @@ import {
   LogIn,
   UserPlus,
   BookOpen,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 
 import type { Recipe } from "@/data/recipes";
@@ -213,6 +215,34 @@ export function RecipeCard({
                 ))}
               </ol>
             </div>
+
+            {Boolean((user as { id: string })?.id && recipe.owner && (user as { id: string }).id === recipe.owner) && (
+              <div className="flex items-center justify-end gap-3 border-t border-border pt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setDetailOpen(false);
+                    router.push(`/recipes/${recipe.id}/edit`);
+                  }}
+                  className="text-xs uppercase tracking-wider"
+                >
+                  <Pencil className="mr-1.5 h-3.5 w-3.5" />
+                  Edit Entry
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    setDetailOpen(false);
+                    router.push(`/recipes/${recipe.id}`);
+                  }}
+                  className="text-xs uppercase tracking-wider"
+                >
+                  View / Delete Page
+                </Button>
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
