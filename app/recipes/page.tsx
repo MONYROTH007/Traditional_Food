@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, X, RotateCcw, Lock, LogIn, UserPlus, Utensils } from "lucide-react";
+import { Search, X, RotateCcw, Utensils } from "lucide-react";
 import { useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
@@ -8,13 +8,6 @@ import { RecipeCard } from "@/components/RecipeCard";
 import { SiteChrome } from "@/components/SiteChrome";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
 import { RECIPE_CATEGORIES, type Recipe } from "@/data/recipes";
 import { createClient } from "@/utils/supabase/client";
 import { mapEntryToRecipe, type EntryRow } from "@/utils/entries";
@@ -31,7 +24,6 @@ export default function RecipesPage() {
   const [page, setPage] = useState(1);
 
   const [user, setUser] = useState<unknown | null>(null);
-  const [pageAuthPromptOpen, setPageAuthPromptOpen] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -122,10 +114,6 @@ export default function RecipesPage() {
   };
 
   const handlePageChange = (newPage: number) => {
-    if (newPage > 1 && !user) {
-      setPageAuthPromptOpen(true);
-      return;
-    }
     setPage(newPage);
   };
 
@@ -210,7 +198,6 @@ export default function RecipesPage() {
                 <RecipeCard
                   key={r.id}
                   recipe={r}
-                  requiresAuth={!user && safePage > 1}
                 />
               ))}
             </div>
@@ -307,60 +294,6 @@ export default function RecipesPage() {
           </div>
         )}
       </div>
-
-      {/* Pagination Auth Required Dialog */}
-      <Dialog open={pageAuthPromptOpen} onOpenChange={setPageAuthPromptOpen}>
-        <DialogContent className="max-w-md border-border bg-card p-6 text-center shadow-warm sm:rounded-md">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-accent/15 text-accent">
-            <Lock className="h-6 w-6" />
-          </div>
-
-          <DialogHeader>
-            <DialogTitle className="text-center font-display text-2xl text-primary">
-              Login Required
-            </DialogTitle>
-            <DialogDescription className="mt-2 text-center text-xs leading-relaxed text-muted-foreground">
-              Accessing Page 2 and additional heritage recipes requires a
-              registered account. Please log in or sign up to continue.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="my-6 space-y-2 rounded-sm border border-border bg-background p-4 text-left text-xs">
-            <p className="font-display text-sm text-accent">
-              ម្ហូបខ្មែរបុរាណ · Battambang
-            </p>
-            <p className="text-muted-foreground">
-              Create a free account or sign in to unlock all recipe pages,
-              ingredients, and instructions.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <Button
-              onClick={() => {
-                setPageAuthPromptOpen(false);
-                router.push("/login");
-              }}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-sm bg-primary px-4 py-2.5 text-xs uppercase tracking-[0.2em] text-primary-foreground"
-            >
-              <LogIn className="h-4 w-4" />
-              <span>Log In</span>
-            </Button>
-
-            <Button
-              variant="outline"
-              onClick={() => {
-                setPageAuthPromptOpen(false);
-                router.push("/signup");
-              }}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-sm border-border text-xs uppercase tracking-[0.2em]"
-            >
-              <UserPlus className="h-4 w-4 text-muted-foreground" />
-              <span>Create Account</span>
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </SiteChrome>
   );
 }

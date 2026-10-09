@@ -11,7 +11,7 @@ import { createClient } from "@/utils/supabase/client";
 const links = [
   { href: "/", label: "Home", exact: true },
   { href: "/recipes", label: "Recipes", exact: false },
-  { href: "/contribute", label: "Contribute", exact: false },
+  { href: "/contribute", label: "My Recipes", exact: false },
 ] as const;
 
 function isActive(pathname: string, href: string, exact: boolean) {
@@ -50,10 +50,10 @@ export function SiteChrome({ children }: { children: ReactNode }) {
     router.refresh();
   };
 
-  const username = user?.user_metadata?.["username"];
+  const fullName = user?.user_metadata?.["full_name"] || user?.user_metadata?.["username"];
 
-  const displayName = username
-    ? (username as string)
+  const displayName = fullName
+    ? (fullName as string)
     : user?.email?.split("@")[0] || user?.email;
 
   return (
@@ -93,7 +93,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
             {user ? (
               <div className="flex items-center gap-4">
                 <span className="max-w-[160px] truncate text-xs font-semibold text-primary">
-                  @{displayName}
+                  {displayName}
                 </span>
                 <button
                   type="button"
@@ -159,7 +159,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
             {user ? (
               <>
                 <div className="border-b border-border px-5 py-3 text-xs font-semibold text-primary">
-                  @{displayName}
+                  {displayName}
                 </div>
                 <button
                   type="button"

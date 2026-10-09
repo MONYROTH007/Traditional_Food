@@ -13,7 +13,7 @@ import { createClient } from "@/utils/supabase/client";
 
 export default function SignupPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -26,8 +26,8 @@ export default function SignupPage() {
     setError(null);
     setSuccess(null);
 
-    if (!username.trim()) {
-      setError("Please enter a username");
+    if (!fullName.trim()) {
+      setError("Please enter your full name");
       return;
     }
 
@@ -51,7 +51,8 @@ export default function SignupPage() {
           password,
           options: {
             data: {
-              username: username.trim(),
+              full_name: fullName.trim(),
+              username: fullName.trim(),
             },
           },
         },
@@ -120,18 +121,18 @@ export default function SignupPage() {
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div className="space-y-1.5">
               <Label
-                htmlFor="username"
+                htmlFor="fullName"
                 className="text-xs uppercase tracking-wider text-foreground"
               >
-                Username
+                Full Name
               </Label>
               <Input
-                id="username"
+                id="fullName"
                 type="text"
                 required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="e.g. sothea_cooks"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="e.g. Sothea Chan"
                 className="border-border bg-background"
               />
             </div>
