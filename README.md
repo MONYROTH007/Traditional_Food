@@ -1,31 +1,63 @@
-# Khmer Kitchen Classics
+# Traditional Khmer Recipes (Battambang Province)
 
-Act as a senior web developer. Build one responsive website called "Traditional Khmer recipes" using next.tsx. 
-Including :
-nav bar - home, recipes, about, contact
- 9 entries/images based in Battambang province.
-pagination at the bottom for 6entries each page and display 3 more on the next page
-design with an old fashion Cambodian ui design style and make it look simplicity rather than complex/overwhelm.
+A web archive dedicated to preserving and sharing traditional Cambodian dishes from Battambang province.
 
-This project was built with [Lovable](https://lovable.dev).
+**Live Application:** https://traditional-khmer-food.lovable.app  
+**Engineering Journal:** See [JOURNAL.md](JOURNAL.md) for full development log, architecture, and AI-assisted notes.
 
-**Live app**: https://traditional-khmer-food.lovable.app
+---
 
-## Build with Lovable
+## Key Features
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/64089910-649a-46db-a7ef-dd931be50ba3).
+### 1. Public Browse & Search (Sprint 1)
+- **Heritage Dishes:** 9 traditional recipes from Battambang province (*Larb Khmer, Mee Kola, Teuk Kreung, Num Banh Chok, Prahok Ktis, Lort Jrouk, Kralan, Song Vak, Amok Trey*).
+- **Search & Filters:** Real-time search across dish titles (Khmer and English), ingredients, notes, and local origins, along with category filtering (*Soups & Stews, Main Dishes, Noodles & Rice, Snacks & Desserts*).
+- **Pagination:** 6 recipes per page with pagination controls.
+- **Traditional Cambodian Design:** Authentic color palette, subtle borders, and Khmer typography (`Moul` display headings, `Battambang` body font).
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+### 2. Contributor Accounts & Contributions (Sprint 2)
+- **Authentication:** Strangers can register (`/signup`) and log in (`/login`) securely via Supabase Auth.
+- **Recipe Contribution:** Authenticated members can submit new family or village recipes (`/contribute`), with required Khmer dish title, ingredient breakdown, and cooking steps.
+- **Dish Photo Uploads:** Direct uploads to isolated Supabase Storage (`photos`), supporting JPG, PNG, and WebP images up to 5 MB.
+- **Public Archive Synchronization:** Newly submitted recipes appear immediately in the public archive.
 
-## Development
+### 3. Row-Level Security & Access Control
+- **Strict Data Isolation:** Contributor A cannot edit or delete Contributor B's recipes or photos through either the user interface or the Supabase REST API.
+- **Postgres Row-Level Security (RLS):** Read access is open to all visitors (`public`), while `INSERT`, `UPDATE`, and `DELETE` operations strictly verify `auth.uid() = owner`.
+- **Storage Policies:** File creation and deletion are restricted to each user's authenticated folder path.
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+### 4. First-Class Khmer Support
+- Native typography using Google Fonts `Moul` and `Battambang`.
+- Full Unicode support across database records, input validations (`\u1780-\u17FF`), search indexes, and automatic category inference.
+
+### 5. Repository Integrity
+- **Zero Secrets in Git:** All secrets remain strictly local (`.env*`); only public client identifiers are used in builds.
+
+---
+
+## Local Development
+
+Prerequisites: Node.js (v18+) and npm.
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+# Clone repository
+git clone <repository-url>
+cd Traditional_Food
+
+# Install dependencies
+npm install
+
+# Start local development server
 npm run dev
 ```
+
+Build for production:
+```sh
+npm run build
+```
+
+---
+
+## Built with Lovable
+
+This project was bootstrapped and developed in collaboration with [Lovable](https://lovable.dev). Every change pushed to the connected branch automatically syncs back with the Lovable editor.
