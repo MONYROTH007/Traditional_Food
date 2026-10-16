@@ -8,12 +8,6 @@ import type { User } from "@supabase/supabase-js";
 import { ContactSection } from "@/components/ContactSection";
 import { createClient } from "@/utils/supabase/client";
 
-const links = [
-  { href: "/", label: "Home", exact: true },
-  { href: "/recipes", label: "Recipes", exact: false },
-  { href: "/contribute", label: "My Recipes", exact: false },
-] as const;
-
 function isActive(pathname: string, href: string, exact: boolean) {
   if (exact) return pathname === href;
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -24,6 +18,16 @@ export function SiteChrome({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const pathname = usePathname();
   const router = useRouter();
+
+  const links = [
+    { href: "/", label: "Home", exact: true },
+    { href: "/recipes", label: "Recipes", exact: false },
+    {
+      href: "/contribute",
+      label: user ? "My Recipes" : "Contribute",
+      exact: false,
+    },
+  ];
 
   useEffect(() => {
     const supabase = createClient();

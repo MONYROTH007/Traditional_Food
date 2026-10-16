@@ -371,9 +371,17 @@ export default function MyRecipesPage() {
         </div>
 
         {successMessage && (
-          <div className="mt-6 flex items-center gap-3 rounded-sm border border-emerald-500/40 bg-emerald-500/10 p-4 text-sm text-emerald-600 dark:text-emerald-400">
-            <CheckCircle2 className="h-5 w-5 shrink-0" />
-            <p>{successMessage}</p>
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-sm border border-emerald-500/40 bg-emerald-500/10 p-4 text-sm text-emerald-600 dark:text-emerald-400">
+            <div className="flex items-center gap-3">
+              <CheckCircle2 className="h-5 w-5 shrink-0" />
+              <p>{successMessage}</p>
+            </div>
+            <Link
+              href="/recipes"
+              className="text-xs font-semibold uppercase tracking-[0.18em] underline hover:text-emerald-700 dark:hover:text-emerald-300"
+            >
+              See in Public Archive →
+            </Link>
           </div>
         )}
 
@@ -389,13 +397,18 @@ export default function MyRecipesPage() {
             </div>
             <h2 className="mt-4 font-display text-2xl text-primary">Login Required</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Only registered members can view and manage their personal contributed recipes.
+              Sign up or log in to add your own traditional recipes to the Battambang archive and manage your contributions.
             </p>
             <div className="mt-6 flex justify-center gap-4">
               <Button asChild className="uppercase tracking-[0.2em] text-xs">
                 <Link href="/login">
                   <LogIn className="mr-2 h-4 w-4" />
                   Log In
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="uppercase tracking-[0.2em] text-xs">
+                <Link href="/signup">
+                  Sign Up
                 </Link>
               </Button>
             </div>

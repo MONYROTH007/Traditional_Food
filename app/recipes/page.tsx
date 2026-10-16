@@ -1,7 +1,8 @@
 "use client";
 
-import { Search, X, RotateCcw, Utensils } from "lucide-react";
+import { Search, X, RotateCcw, Utensils, Plus } from "lucide-react";
 import { useMemo, useState, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { RecipeCard } from "@/components/RecipeCard";
@@ -120,16 +121,27 @@ export default function RecipesPage() {
   return (
     <SiteChrome>
       <div className="mx-auto w-full max-w-5xl px-5 py-12">
-        <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-          Battambang
-        </p>
-        <h1 className="mt-2 font-display text-3xl text-primary sm:text-4xl">
-          The Recipes
-        </h1>
-        <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
-          Dishes cooked in the villages, markets and riverside kitchens of
-          Battambang province.
-        </p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+              Battambang
+            </p>
+            <h1 className="mt-2 font-display text-3xl text-primary sm:text-4xl">
+              The Recipes
+            </h1>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
+              Dishes cooked in the villages, markets and riverside kitchens of
+              Battambang province.
+            </p>
+          </div>
+          <Link
+            href="/contribute"
+            className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2.5 text-xs uppercase tracking-[0.2em] text-primary-foreground transition-colors hover:bg-primary/90 shrink-0"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Contribute Recipe</span>
+          </Link>
+        </div>
 
         <div className="mt-8 flex flex-col gap-5 border-y border-border py-6">
           <div className="relative w-full max-w-md">
