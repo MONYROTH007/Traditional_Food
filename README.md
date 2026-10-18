@@ -3,7 +3,6 @@
 A web archive dedicated to preserving and sharing traditional Cambodian dishes from Battambang province.
 
 **Live Application:** https://traditional-khmer-food.lovable.app  
-**Engineering Journal:** See [JOURNAL.md](JOURNAL.md) for full development log, architecture, and AI-assisted notes.
 
 ---
 
@@ -57,7 +56,3 @@ npm run build
 ```
 
 ---
-
-## Built with Lovable
-
-This project was bootstrapped and developed in collaboration with [Lovable](https://lovable.dev). Every change pushed to the connected branch automatically syncs back with the Lovable editor.
