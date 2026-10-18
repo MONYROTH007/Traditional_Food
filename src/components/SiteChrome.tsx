@@ -22,11 +22,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
   const links = [
     { href: "/", label: "Home", exact: true },
     { href: "/recipes", label: "Recipes", exact: false },
-    {
-      href: "/contribute",
-      label: user ? "My Recipes" : "Contribute",
-      exact: false,
-    },
+    { href: "/contribute", label: "My Recipes", exact: false },
   ];
 
   useEffect(() => {
@@ -211,8 +207,12 @@ export function SiteChrome({ children }: { children: ReactNode }) {
       <main className="flex-1">{children}</main>
 
       <footer className="border-t border-border bg-card">
-        <ContactSection />
-        <div className="border-t border-border mx-auto w-full max-w-5xl px-5 py-8 text-center text-sm text-muted-foreground">
+        {pathname === "/" && <ContactSection />}
+        <div
+          className={`${
+            pathname === "/" ? "border-t border-border" : ""
+          } mx-auto w-full max-w-5xl px-5 py-8 text-center text-sm text-muted-foreground`}
+        >
           <p className="font-display text-base text-primary">សូមអញ្ជើញពិសា</p>
           <p className="mt-2">
             Recipes kept by families of Battambang province, Cambodia.
