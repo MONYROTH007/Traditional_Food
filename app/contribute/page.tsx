@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef, ChangeEvent, FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Lock,
@@ -9,21 +8,18 @@ import {
   Upload,
   Loader2,
   AlertCircle,
-  Plus,
-  BookOpen,
-  Utensils,
   CheckCircle2,
+  ListOrdered,
+  Plus,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 import { SiteChrome } from "@/components/SiteChrome";
-import { RecipeCard } from "@/components/RecipeCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { createClient } from "@/utils/supabase/client";
 import { mapEntryToRecipe, type EntryRow } from "@/utils/entries";
-import type { Recipe } from "@/data/recipes";
 
 type FieldErrors = {
   title?: string | undefined;
@@ -34,19 +30,11 @@ type FieldErrors = {
   photo?: string | undefined;
 };
 
-export default function MyRecipesPage() {
-  const router = useRouter();
+export default function ContributePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
-
-  // User's owned recipes & loading state
-  const [myRecipes, setMyRecipes] = useState<Recipe[]>([]);
-  const [loadingEntries, setLoadingEntries] = useState(true);
-
-  // Active view tab: "list" | "add"
-  const [activeTab, setActiveTab] = useState<"list" | "add">("list");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Form field states
@@ -82,40 +70,6 @@ export default function MyRecipesPage() {
       subscription.unsubscribe();
     };
   }, []);
-
-  useEffect(() => {
-    if (!user) {
-      setMyRecipes([]);
-      setLoadingEntries(false);
-      return;
-    }
-
-    async function fetchMyEntries() {
-      try {
-        setLoadingEntries(true);
-        const supabase = createClient();
-        const { data, error } = await supabase
-          .from("entries")
-          .select("*")
-          .eq("owner", user!.id)
-          .order("created_at", { ascending: false });
-
-        if (error) {
-          console.error("Error fetching user entries:", error);
-          setMyRecipes([]);
-        } else if (data) {
-          setMyRecipes(data.map((row: EntryRow) => mapEntryToRecipe(row)));
-        }
-      } catch (err) {
-        console.error("Failed to fetch user entries:", err);
-        setMyRecipes([]);
-      } finally {
-        setLoadingEntries(false);
-      }
-    }
-
-    fetchMyEntries();
-  }, [user]);
 
   useEffect(() => {
     return () => {
@@ -224,6 +178,19 @@ export default function MyRecipesPage() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleResetForm = () => {
+    setTitle("");
+    setTitleEn("");
+    setIngredients("");
+    setSteps("");
+    setSource("");
+    setPhotoFile(null);
+    if (photoPreview) URL.revokeObjectURL(photoPreview);
+    setPhotoPreview(null);
+    setErrors({});
+    setGeneralError(null);
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setGeneralError(null);
@@ -277,6 +244,7 @@ export default function MyRecipesPage() {
       const stepsTrimmed = steps.trim();
       const sourceTrimmed = source.trim();
 
+      // Note: do NOT send status; database default sets it to 'pending'
       const { data: insertData, error: insertError } = await supabase
         .from("entries")
         .insert([
@@ -304,22 +272,11 @@ export default function MyRecipesPage() {
 
       if (insertData) {
         const newRecipe = mapEntryToRecipe(insertData as EntryRow);
-        setMyRecipes((prev) => [newRecipe, ...prev]);
-
-        // Reset form fields
-        setTitle("");
-        setTitleEn("");
-        setIngredients("");
-        setSteps("");
-        setSource("");
-        setPhotoFile(null);
-        if (photoPreview) URL.revokeObjectURL(photoPreview);
-        setPhotoPreview(null);
+        handleResetForm();
         setIsSubmitting(false);
         setSuccessMessage(
           `Submission Received! Your dish "${newRecipe.name}" has been submitted to the Battambang Food Archive curators. Curators usually review family recipes within 1–3 business days to verify culinary provenance, ingredient measurements, and photo quality.`
         );
-        setActiveTab("list");
       }
     } catch (err) {
       console.error("Unexpected submission error:", err);
@@ -330,60 +287,49 @@ export default function MyRecipesPage() {
 
   return (
     <SiteChrome>
-      <div className="mx-auto w-full max-w-5xl px-5 py-12">
+      <div className="mx-auto w-full max-w-3xl px-5 py-12">
         <div className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-              Personal Collection
+              Heritage Archive
             </p>
             <h1 className="mt-2 font-display text-3xl text-primary sm:text-4xl">
-              My Recipes
+              Contribute a Recipe
             </h1>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Browse and view traditional recipes that you have contributed to the Battambang food archive.
+              Share a traditional Khmer dish from your family or village to be submitted for curation in the Battambang archive.
             </p>
           </div>
 
           {user && (
-            <div className="flex items-center gap-3">
-              <Button
-                variant={activeTab === "list" ? "default" : "outline"}
-                onClick={() => {
-                  setActiveTab("list");
-                  setSuccessMessage(null);
-                }}
-                className="text-xs uppercase tracking-[0.18em]"
-              >
-                <BookOpen className="mr-2 h-4 w-4" />
-                My Recipes ({myRecipes.length})
-              </Button>
-              <Button
-                variant={activeTab === "add" ? "default" : "outline"}
-                onClick={() => {
-                  setActiveTab("add");
-                  setSuccessMessage(null);
-                }}
-                className="text-xs uppercase tracking-[0.18em]"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Add Recipe
-              </Button>
-            </div>
+            <Button asChild variant="outline" className="text-xs uppercase tracking-[0.18em] shrink-0">
+              <Link href="/my-entries">
+                <ListOrdered className="mr-2 h-4 w-4" />
+                View My Entries
+              </Link>
+            </Button>
           )}
         </div>
 
+        {/* Confirmation banner after submission */}
         {successMessage && (
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-sm border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-foreground">
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-sm border border-amber-500/40 bg-amber-500/10 p-5 text-sm text-foreground">
             <div className="flex items-start gap-3">
               <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
-              <p className="leading-relaxed">{successMessage}</p>
+              <div className="space-y-1">
+                <p className="font-semibold text-foreground">Submission Received</p>
+                <p className="text-xs leading-relaxed text-muted-foreground">
+                  {successMessage}
+                </p>
+              </div>
             </div>
-            <Link
-              href="/my-entries"
-              className="text-xs font-semibold uppercase tracking-[0.18em] underline text-primary hover:text-primary/80"
-            >
-              View in My Entries →
-            </Link>
+            <div className="flex items-center gap-3">
+              <Button asChild size="sm" className="text-xs uppercase tracking-wider">
+                <Link href="/my-entries">
+                  Go to My Entries →
+                </Link>
+              </Button>
+            </div>
           </div>
         )}
 
@@ -399,7 +345,7 @@ export default function MyRecipesPage() {
             </div>
             <h2 className="mt-4 font-display text-2xl text-primary">Login Required</h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Sign up or log in to add your own traditional recipes to the Battambang archive and manage your contributions.
+              Sign up or log in to submit your traditional recipes to the Battambang archive and track their curation.
             </p>
             <div className="mt-6 flex justify-center gap-4">
               <Button asChild className="uppercase tracking-[0.2em] text-xs">
@@ -415,284 +361,232 @@ export default function MyRecipesPage() {
               </Button>
             </div>
           </div>
-        ) : activeTab === "list" ? (
-          <div className="mt-8">
-            {loadingEntries ? (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="animate-pulse rounded-sm border border-border bg-card p-5"
-                  >
-                    <div className="h-48 w-full rounded-sm bg-muted" />
-                    <div className="mt-4 h-4 w-1/3 rounded bg-muted" />
-                    <div className="mt-2 h-6 w-2/3 rounded bg-muted" />
-                    <div className="mt-3 h-10 w-full rounded bg-muted" />
-                  </div>
-                ))}
-              </div>
-            ) : myRecipes.length > 0 ? (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {myRecipes.map((r) => (
-                  <RecipeCard key={r.id} recipe={r} />
-                ))}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center rounded-sm border border-dashed border-border px-4 py-16 text-center">
-                <div className="rounded-full bg-muted p-4 text-muted-foreground">
-                  <Utensils className="h-8 w-8" />
+        ) : (
+          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+            {generalError && (
+              <div className="flex items-start gap-3 rounded-sm border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
+                <div>
+                  <p className="font-semibold">Save Failed</p>
+                  <p className="mt-0.5 text-xs text-destructive/90">{generalError}</p>
                 </div>
-                <h3 className="mt-4 font-display text-xl text-primary">
-                  No recipes added yet
-                </h3>
-                <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-                  You haven't contributed any traditional recipes to the archive yet.
-                </p>
-                <Button
-                  type="button"
-                  onClick={() => setActiveTab("add")}
-                  className="mt-6 inline-flex items-center gap-2 uppercase tracking-[0.2em] text-xs"
-                >
-                  <Plus className="h-4 w-4" />
-                  Add Your First Recipe
-                </Button>
               </div>
             )}
-          </div>
-        ) : (
-          <div className="mx-auto mt-8 max-w-3xl">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="border-b border-border pb-4">
-                <h2 className="font-display text-2xl text-primary">
-                  Contribute a Recipe
-                </h2>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Share a traditional Khmer dish from your family or village to be saved under your account.
+
+            {/* Title */}
+            <div>
+              <label htmlFor="title" className="block text-xs font-medium uppercase tracking-wider text-foreground">
+                Dish Name in Khmer (ឈ្មោះម្ហូប) <span className="text-destructive">*</span>
+              </label>
+              <Input
+                id="title"
+                type="text"
+                placeholder="e.g. ឡាបខ្មែរ ឬ អាម៉ុកត្រី"
+                value={title}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  if (errors.title) setErrors((prev) => ({ ...prev, title: undefined }));
+                }}
+                className={`mt-2 ${errors.title ? "border-destructive focus-visible:ring-destructive" : ""}`}
+              />
+              {errors.title ? (
+                <p className="mt-1 text-xs text-destructive">{errors.title}</p>
+              ) : (
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Must contain Khmer script (2–120 characters).
                 </p>
-              </div>
-
-              {generalError && (
-                <div className="flex items-start gap-3 rounded-sm border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
-                  <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
-                  <div>
-                    <p className="font-semibold">Save Failed</p>
-                    <p className="mt-0.5 text-xs text-destructive/90">{generalError}</p>
-                  </div>
-                </div>
               )}
+            </div>
 
-              {/* Title */}
-              <div>
-                <label htmlFor="title" className="block text-xs font-medium uppercase tracking-wider text-foreground">
-                  Dish Name in Khmer (ឈ្មោះម្ហូប) <span className="text-destructive">*</span>
-                </label>
-                <Input
-                  id="title"
-                  type="text"
-                  placeholder="e.g. ឡាបខ្មែរ ឬ អាម៉ុកត្រី"
-                  value={title}
-                  onChange={(e) => {
-                    setTitle(e.target.value);
-                    if (errors.title) setErrors((prev) => ({ ...prev, title: undefined }));
-                  }}
-                  className={`mt-2 ${errors.title ? "border-destructive focus-visible:ring-destructive" : ""}`}
-                />
-                {errors.title ? (
-                  <p className="mt-1 text-xs text-destructive">{errors.title}</p>
-                ) : (
-                  <p className="mt-1 text-[11px] text-muted-foreground">
-                    Must contain Khmer script (2–120 characters).
-                  </p>
-                )}
-              </div>
+            {/* Title EN */}
+            <div>
+              <label htmlFor="title_en" className="block text-xs font-medium uppercase tracking-wider text-foreground">
+                English Name (optional)
+              </label>
+              <Input
+                id="title_en"
+                type="text"
+                placeholder="e.g. Larb Khmer or Fish Amok"
+                value={titleEn}
+                onChange={(e) => {
+                  setTitleEn(e.target.value);
+                  if (errors.title_en) setErrors((prev) => ({ ...prev, title_en: undefined }));
+                }}
+                className={`mt-2 ${errors.title_en ? "border-destructive focus-visible:ring-destructive" : ""}`}
+              />
+              {errors.title_en ? (
+                <p className="mt-1 text-xs text-destructive">{errors.title_en}</p>
+              ) : (
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Latin letters, numbers, and common punctuation only (max 100 chars).
+                </p>
+              )}
+            </div>
 
-              {/* Title EN */}
-              <div>
-                <label htmlFor="title_en" className="block text-xs font-medium uppercase tracking-wider text-foreground">
-                  English Name (optional)
-                </label>
-                <Input
-                  id="title_en"
-                  type="text"
-                  placeholder="e.g. Larb Khmer or Fish Amok"
-                  value={titleEn}
-                  onChange={(e) => {
-                    setTitleEn(e.target.value);
-                    if (errors.title_en) setErrors((prev) => ({ ...prev, title_en: undefined }));
-                  }}
-                  className={`mt-2 ${errors.title_en ? "border-destructive focus-visible:ring-destructive" : ""}`}
-                />
-                {errors.title_en ? (
-                  <p className="mt-1 text-xs text-destructive">{errors.title_en}</p>
-                ) : (
-                  <p className="mt-1 text-[11px] text-muted-foreground">
-                    Latin letters, numbers, and common punctuation only (max 100 chars).
-                  </p>
-                )}
-              </div>
-
-              {/* Ingredients */}
-              <div>
-                <label htmlFor="ingredients" className="block text-xs font-medium uppercase tracking-wider text-foreground">
-                  Ingredients (គ្រឿងផ្សំ) <span className="text-destructive">*</span>
-                </label>
-                <Textarea
-                  id="ingredients"
-                  rows={5}
-                  placeholder="List ingredients line by line, e.g.:
+            {/* Ingredients */}
+            <div>
+              <label htmlFor="ingredients" className="block text-xs font-medium uppercase tracking-wider text-foreground">
+                Ingredients (គ្រឿងផ្សំ) <span className="text-destructive">*</span>
+              </label>
+              <Textarea
+                id="ingredients"
+                rows={5}
+                placeholder="List ingredients line by line, e.g.:
 400g lean beef or pork, finely minced
 2 tbsp toasted rice powder
 3 tbsp fresh lime juice"
-                  value={ingredients}
-                  onChange={(e) => {
-                    setIngredients(e.target.value);
-                    if (errors.ingredients) setErrors((prev) => ({ ...prev, ingredients: undefined }));
-                  }}
-                  className={`mt-2 ${errors.ingredients ? "border-destructive focus-visible:ring-destructive" : ""}`}
-                />
-                {errors.ingredients ? (
-                  <p className="mt-1 text-xs text-destructive">{errors.ingredients}</p>
-                ) : (
-                  <p className="mt-1 text-[11px] text-muted-foreground">
-                    Provide the list of ingredients (10–2000 characters).
-                  </p>
-                )}
-              </div>
+                value={ingredients}
+                onChange={(e) => {
+                  setIngredients(e.target.value);
+                  if (errors.ingredients) setErrors((prev) => ({ ...prev, ingredients: undefined }));
+                }}
+                className={`mt-2 ${errors.ingredients ? "border-destructive focus-visible:ring-destructive" : ""}`}
+              />
+              {errors.ingredients ? (
+                <p className="mt-1 text-xs text-destructive">{errors.ingredients}</p>
+              ) : (
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Provide the list of ingredients (10–2000 characters).
+                </p>
+              )}
+            </div>
 
-              {/* Steps */}
-              <div>
-                <label htmlFor="steps" className="block text-xs font-medium uppercase tracking-wider text-foreground">
-                  Cooking Steps (វិធីធ្វើ) <span className="text-destructive">*</span>
-                </label>
-                <Textarea
-                  id="steps"
-                  rows={6}
-                  placeholder="Describe preparation and cooking step by step, e.g.:
+            {/* Steps */}
+            <div>
+              <label htmlFor="steps" className="block text-xs font-medium uppercase tracking-wider text-foreground">
+                Cooking Steps (វិធីធ្វើ) <span className="text-destructive">*</span>
+              </label>
+              <Textarea
+                id="steps"
+                rows={6}
+                placeholder="Describe preparation and cooking step by step, e.g.:
 1. Heat a skillet over medium heat and stir-fry minced meat with prahok until cooked.
 2. Transfer cooked meat to a bowl and add lime juice and fish sauce."
-                  value={steps}
-                  onChange={(e) => {
-                    setSteps(e.target.value);
-                    if (errors.steps) setErrors((prev) => ({ ...prev, steps: undefined }));
-                  }}
-                  className={`mt-2 ${errors.steps ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                value={steps}
+                onChange={(e) => {
+                  setSteps(e.target.value);
+                  if (errors.steps) setErrors((prev) => ({ ...prev, steps: undefined }));
+                }}
+                className={`mt-2 ${errors.steps ? "border-destructive focus-visible:ring-destructive" : ""}`}
+              />
+              {errors.steps ? (
+                <p className="mt-1 text-xs text-destructive">{errors.steps}</p>
+              ) : (
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Describe how to prepare and cook the dish (20–3000 characters).
+                </p>
+              )}
+            </div>
+
+            {/* Source */}
+            <div>
+              <label htmlFor="source" className="block text-xs font-medium uppercase tracking-wider text-foreground">
+                Source / Provenance (optional)
+              </label>
+              <Input
+                id="source"
+                type="text"
+                placeholder="e.g. Family tables across Battambang town or Market seller"
+                value={source}
+                onChange={(e) => {
+                  setSource(e.target.value);
+                  if (errors.source) setErrors((prev) => ({ ...prev, source: undefined }));
+                }}
+                className={`mt-2 ${errors.source ? "border-destructive focus-visible:ring-destructive" : ""}`}
+              />
+              {errors.source ? (
+                <p className="mt-1 text-xs text-destructive">{errors.source}</p>
+              ) : (
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Who or where the recipe came from (max 150 chars).
+                </p>
+              )}
+            </div>
+
+            {/* Photo Upload */}
+            <div>
+              <label htmlFor="photo" className="block text-xs font-medium uppercase tracking-wider text-foreground">
+                Dish Photo <span className="text-destructive">*</span>
+              </label>
+
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className={`mt-2 flex cursor-pointer flex-col items-center justify-center rounded-sm border-2 border-dashed p-6 text-center transition-colors ${
+                  errors.photo
+                    ? "border-destructive/60 bg-destructive/5"
+                    : "border-border bg-card/50 hover:bg-card"
+                }`}
+              >
+                <input
+                  ref={fileInputRef}
+                  id="photo"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handlePhotoChange}
+                  className="hidden"
                 />
-                {errors.steps ? (
-                  <p className="mt-1 text-xs text-destructive">{errors.steps}</p>
+
+                {photoPreview ? (
+                  <div className="relative flex flex-col items-center">
+                    <img
+                      src={photoPreview}
+                      alt="Selected dish preview"
+                      className="h-44 w-full max-w-md rounded-sm object-cover shadow-sm"
+                    />
+                    <p className="mt-2 text-xs font-medium text-primary">
+                      Click to change photo ({photoFile?.name})
+                    </p>
+                  </div>
                 ) : (
-                  <p className="mt-1 text-[11px] text-muted-foreground">
-                    Describe how to prepare and cook the dish (20–3000 characters).
-                  </p>
+                  <div className="flex flex-col items-center">
+                    <div className="rounded-full bg-muted p-3 text-muted-foreground">
+                      <Upload className="h-6 w-6" />
+                    </div>
+                    <p className="mt-2 text-xs font-medium text-foreground">
+                      Click to select a photo of the dish
+                    </p>
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      JPG, PNG, or WebP formats supported (max 5 MB)
+                    </p>
+                  </div>
                 )}
               </div>
 
-              {/* Source */}
-              <div>
-                <label htmlFor="source" className="block text-xs font-medium uppercase tracking-wider text-foreground">
-                  Source / Provenance (optional)
-                </label>
-                <Input
-                  id="source"
-                  type="text"
-                  placeholder="e.g. Family tables across Battambang town or Market seller"
-                  value={source}
-                  onChange={(e) => {
-                    setSource(e.target.value);
-                    if (errors.source) setErrors((prev) => ({ ...prev, source: undefined }));
-                  }}
-                  className={`mt-2 ${errors.source ? "border-destructive focus-visible:ring-destructive" : ""}`}
-                />
-                {errors.source ? (
-                  <p className="mt-1 text-xs text-destructive">{errors.source}</p>
+              {errors.photo && (
+                <p className="mt-1 text-xs text-destructive">{errors.photo}</p>
+              )}
+            </div>
+
+            {/* Submit Actions */}
+            <div className="flex justify-end gap-4 border-t border-border pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleResetForm}
+                disabled={isSubmitting}
+                className="text-xs uppercase tracking-[0.2em]"
+              >
+                Clear Form
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="min-w-[160px] text-xs uppercase tracking-[0.2em]"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Uploading & Saving...
+                  </>
                 ) : (
-                  <p className="mt-1 text-[11px] text-muted-foreground">
-                    Who or where the recipe came from (max 150 chars).
-                  </p>
+                  <>
+                    <Plus className="mr-1.5 h-4 w-4" />
+                    Submit Recipe
+                  </>
                 )}
-              </div>
-
-              {/* Photo Upload */}
-              <div>
-                <label htmlFor="photo" className="block text-xs font-medium uppercase tracking-wider text-foreground">
-                  Dish Photo <span className="text-destructive">*</span>
-                </label>
-
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  className={`mt-2 flex cursor-pointer flex-col items-center justify-center rounded-sm border-2 border-dashed p-6 text-center transition-colors ${
-                    errors.photo
-                      ? "border-destructive/60 bg-destructive/5"
-                      : "border-border bg-card/50 hover:bg-card"
-                  }`}
-                >
-                  <input
-                    ref={fileInputRef}
-                    id="photo"
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    onChange={handlePhotoChange}
-                    className="hidden"
-                  />
-
-                  {photoPreview ? (
-                    <div className="relative flex flex-col items-center">
-                      <img
-                        src={photoPreview}
-                        alt="Selected dish preview"
-                        className="h-44 w-full max-w-md rounded-sm object-cover shadow-sm"
-                      />
-                      <p className="mt-2 text-xs font-medium text-primary">
-                        Click to change photo ({photoFile?.name})
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center">
-                      <div className="rounded-full bg-muted p-3 text-muted-foreground">
-                        <Upload className="h-6 w-6" />
-                      </div>
-                      <p className="mt-2 text-xs font-medium text-foreground">
-                        Click to select a photo of the dish
-                      </p>
-                      <p className="mt-1 text-[11px] text-muted-foreground">
-                        JPG, PNG, or WebP formats supported (max 5 MB)
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {errors.photo && (
-                  <p className="mt-1 text-xs text-destructive">{errors.photo}</p>
-                )}
-              </div>
-
-              {/* Submit Actions */}
-              <div className="flex justify-end gap-4 border-t border-border pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setActiveTab("list")}
-                  disabled={isSubmitting}
-                  className="text-xs uppercase tracking-[0.2em]"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="min-w-[160px] text-xs uppercase tracking-[0.2em]"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Uploading & Saving...
-                    </>
-                  ) : (
-                    "Submit Recipe"
-                  )}
-                </Button>
-              </div>
-            </form>
-          </div>
+              </Button>
+            </div>
+          </form>
         )}
       </div>
     </SiteChrome>
