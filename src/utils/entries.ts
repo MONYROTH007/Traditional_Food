@@ -19,6 +19,7 @@ export type EntryRow = {
   photo_url: string | null;
   created_at?: string;
   owner?: string | null;
+  status?: "pending" | "published" | "returned" | string | null;
 };
 
 const IMAGE_MAP: Record<string, string> = {
@@ -117,5 +118,41 @@ export function mapEntryToRecipe(entry: EntryRow): Recipe {
     ingredients: ingredientsList,
     instructions: instructionsList,
     owner: entry.owner ?? null,
+    status: entry.status ?? "pending",
   };
 }
+
+export type EntryStatus = "pending" | "published" | "returned";
+
+export function getStatusDetails(status: string | null | undefined): {
+  labelEn: string;
+  labelKm: string;
+  combined: string;
+  badgeClass: string;
+} {
+  switch (status) {
+    case "published":
+      return {
+        labelEn: "Published",
+        labelKm: "បានផ្សព្វផ្សាយ",
+        combined: "Published / បានផ្សព្វផ្សាយ",
+        badgeClass: "border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+      };
+    case "returned":
+      return {
+        labelEn: "Returned for Revisions",
+        labelKm: "បានប្រគល់ត្រឡប់មកវិញ",
+        combined: "Returned for Revisions / បានប្រគល់ត្រឡប់មកវិញ",
+        badgeClass: "border-rose-500/40 bg-rose-500/10 text-rose-600 dark:text-rose-400",
+      };
+    case "pending":
+    default:
+      return {
+        labelEn: "Pending Review",
+        labelKm: "កំពុងរង់ចាំការពិនិត្យ",
+        combined: "Pending Review / កំពុងរង់ចាំការពិនិត្យ",
+        badgeClass: "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400",
+      };
+  }
+}
+

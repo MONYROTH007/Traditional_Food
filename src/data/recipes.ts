@@ -31,6 +31,7 @@ export type Recipe = {
   ingredients: string[];
   instructions: string[];
   owner?: string | null;
+  status?: "pending" | "published" | "returned" | string | null;
 };
 
 export const recipes: Recipe[] = [

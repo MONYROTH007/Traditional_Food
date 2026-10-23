@@ -316,7 +316,9 @@ export default function MyRecipesPage() {
         if (photoPreview) URL.revokeObjectURL(photoPreview);
         setPhotoPreview(null);
         setIsSubmitting(false);
-        setSuccessMessage(`"${newRecipe.name}" has been added to your recipes!`);
+        setSuccessMessage(
+          `Submission Received! Your dish "${newRecipe.name}" has been submitted to the Battambang Food Archive curators. Curators usually review family recipes within 1–3 business days to verify culinary provenance, ingredient measurements, and photo quality.`
+        );
         setActiveTab("list");
       }
     } catch (err) {
@@ -371,16 +373,16 @@ export default function MyRecipesPage() {
         </div>
 
         {successMessage && (
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-sm border border-emerald-500/40 bg-emerald-500/10 p-4 text-sm text-emerald-600 dark:text-emerald-400">
-            <div className="flex items-center gap-3">
-              <CheckCircle2 className="h-5 w-5 shrink-0" />
-              <p>{successMessage}</p>
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-sm border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-foreground">
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
+              <p className="leading-relaxed">{successMessage}</p>
             </div>
             <Link
-              href="/recipes"
-              className="text-xs font-semibold uppercase tracking-[0.18em] underline hover:text-emerald-700 dark:hover:text-emerald-300"
+              href="/my-entries"
+              className="text-xs font-semibold uppercase tracking-[0.18em] underline text-primary hover:text-primary/80"
             >
-              See in Public Archive →
+              View in My Entries →
             </Link>
           </div>
         )}

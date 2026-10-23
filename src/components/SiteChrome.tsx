@@ -22,7 +22,10 @@ export function SiteChrome({ children }: { children: ReactNode }) {
   const links = [
     { href: "/", label: "Home", exact: true },
     { href: "/recipes", label: "Recipes", exact: false },
-    { href: "/contribute", label: "My Recipes", exact: false },
+    ...(user
+      ? [{ href: "/my-entries", label: "My Entries", exact: false }]
+      : []),
+    { href: "/contribute", label: "Contribute", exact: false },
   ];
 
   useEffect(() => {

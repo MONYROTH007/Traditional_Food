@@ -273,6 +273,18 @@ export default function EditRecipePage({
         updatedPhotoUrl = publicUrlData.publicUrl;
       }
 
+      // Check reviewer role via RPC
+      let isReviewer = false;
+      try {
+        const { data: reviewerData, error: rpcError } = await supabase.rpc("is_reviewer");
+        if (!rpcError && reviewerData === true) {
+          isReviewer = true;
+        }
+      } catch (rpcErr) {
+        console.warn("Failed checking reviewer role:", rpcErr);
+        isReviewer = false;
+      }
+
       // Update record in entries table
       const titleTrimmed = title.trim();
       const titleEnTrimmed = titleEn.trim();
@@ -280,16 +292,30 @@ export default function EditRecipePage({
       const stepsTrimmed = steps.trim();
       const sourceTrimmed = source.trim();
 
+      const updatePayload: {
+        title: string;
+        title_en: string | null;
+        ingredients: string;
+        steps: string;
+        source: string | null;
+        photo_url: string | null;
+        status?: string;
+      } = {
+        title: titleTrimmed,
+        title_en: titleEnTrimmed || null,
+        ingredients: ingredientsTrimmed,
+        steps: stepsTrimmed,
+        source: sourceTrimmed || null,
+        photo_url: updatedPhotoUrl,
+      };
+
+      if (!isReviewer) {
+        updatePayload.status = "pending";
+      }
+
       const { data: updateData, error: updateError } = await supabase
         .from("entries")
-        .update({
-          title: titleTrimmed,
-          title_en: titleEnTrimmed || null,
-          ingredients: ingredientsTrimmed,
-          steps: stepsTrimmed,
-          source: sourceTrimmed || null,
-          photo_url: updatedPhotoUrl,
-        })
+        .update(updatePayload)
         .eq("id", resolvedParams.id)
         .select();
 

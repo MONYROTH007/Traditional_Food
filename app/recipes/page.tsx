@@ -51,6 +51,7 @@ export default function RecipesPage() {
         const { data, error } = await supabase
           .from("entries")
           .select("*")
+          .eq("status", "published")
           .order("created_at", { ascending: false });
 
         if (error) {
