@@ -16,6 +16,7 @@ function isActive(pathname: string, href: string, exact: boolean) {
 export function SiteChrome({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [isReviewer, setIsReviewer] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -25,20 +26,42 @@ export function SiteChrome({ children }: { children: ReactNode }) {
     ...(user
       ? [{ href: "/my-entries", label: "My Entries", exact: false }]
       : []),
+    ...(isReviewer
+      ? [{ href: "/review", label: "Review", exact: false }]
+      : []),
     { href: "/contribute", label: "Contribute", exact: false },
   ];
 
   useEffect(() => {
     const supabase = createClient();
 
+    const checkReviewer = async () => {
+      try {
+        const { data, error } = await supabase.rpc("is_reviewer");
+        setIsReviewer(data === true && !error);
+      } catch {
+        setIsReviewer(false);
+      }
+    };
+
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user ?? null);
+      if (data.user) {
+        checkReviewer();
+      } else {
+        setIsReviewer(false);
+      }
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        checkReviewer();
+      } else {
+        setIsReviewer(false);
+      }
     });
 
     return () => {
@@ -50,6 +73,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
     const supabase = createClient();
     await supabase.auth.signOut();
     setUser(null);
+    setIsReviewer(false);
     router.refresh();
   };
 
@@ -62,10 +86,10 @@ export function SiteChrome({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <header className="border-b border-border bg-card">
-        <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-5 py-5">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
           <Link
             href="/"
-            className="leading-tight"
+            className="leading-tight shrink-0"
             onClick={() => setOpen(false)}
           >
             <span className="block font-display text-xl tracking-wide text-primary sm:text-2xl">
@@ -76,14 +100,14 @@ export function SiteChrome({ children }: { children: ReactNode }) {
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-7 sm:flex">
+          <nav className="hidden items-center gap-4 md:gap-5 lg:gap-7 sm:flex">
             {links.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
-                className={`text-sm uppercase tracking-[0.18em] transition-colors hover:text-primary ${
+                className={`text-xs md:text-sm uppercase tracking-[0.14em] lg:tracking-[0.18em] whitespace-nowrap transition-colors hover:text-primary ${
                   isActive(pathname, l.href, l.exact)
-                    ? "text-primary"
+                    ? "text-primary font-medium"
                     : "text-muted-foreground"
                 }`}
               >
@@ -91,28 +115,28 @@ export function SiteChrome({ children }: { children: ReactNode }) {
               </Link>
             ))}
 
-            <div className="h-4 w-px bg-border" />
+            <div className="h-4 w-px bg-border shrink-0" />
 
             {user ? (
-              <div className="flex items-center gap-4">
-                <span className="max-w-[160px] truncate text-xs font-semibold text-primary">
+              <div className="flex items-center gap-3 lg:gap-4 shrink-0">
+                <span className="max-w-[130px] lg:max-w-[170px] truncate text-xs font-semibold text-primary">
                   {displayName}
                 </span>
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="cursor-pointer text-sm uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:text-primary"
+                  className="cursor-pointer text-xs md:text-sm uppercase tracking-[0.14em] lg:tracking-[0.18em] whitespace-nowrap text-muted-foreground transition-colors hover:text-primary"
                 >
                   Logout
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-6">
+              <div className="flex items-center gap-4 lg:gap-6 shrink-0">
                 <Link
                   href="/login"
-                  className={`text-sm uppercase tracking-[0.18em] transition-colors hover:text-primary ${
+                  className={`text-xs md:text-sm uppercase tracking-[0.14em] lg:tracking-[0.18em] whitespace-nowrap transition-colors hover:text-primary ${
                     isActive(pathname, "/login", false)
-                      ? "text-primary"
+                      ? "text-primary font-medium"
                       : "text-muted-foreground"
                   }`}
                 >
@@ -120,9 +144,9 @@ export function SiteChrome({ children }: { children: ReactNode }) {
                 </Link>
                 <Link
                   href="/signup"
-                  className={`text-sm uppercase tracking-[0.18em] transition-colors hover:text-primary ${
+                  className={`text-xs md:text-sm uppercase tracking-[0.14em] lg:tracking-[0.18em] whitespace-nowrap transition-colors hover:text-primary ${
                     isActive(pathname, "/signup", false)
-                      ? "text-primary"
+                      ? "text-primary font-medium"
                       : "text-muted-foreground"
                   }`}
                 >
@@ -214,7 +238,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
         <div
           className={`${
             pathname === "/" ? "border-t border-border" : ""
-          } mx-auto w-full max-w-5xl px-5 py-8 text-center text-sm text-muted-foreground`}
+          } mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8 text-center text-sm text-muted-foreground`}
         >
           <p className="font-display text-base text-primary">សូមអញ្ជើញពិសា</p>
           <p className="mt-2">

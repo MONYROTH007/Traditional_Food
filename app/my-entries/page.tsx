@@ -105,7 +105,7 @@ export default function MyEntriesPage() {
 
   return (
     <SiteChrome>
-      <div className="mx-auto w-full max-w-5xl px-5 py-12">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
         {/* Header Section */}
         <div className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -220,7 +220,7 @@ export default function MyEntriesPage() {
 
             {/* List of Entries */}
             {loadingEntries ? (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
                 {Array.from({ length: 3 }).map((_, i) => (
                   <div
                     key={i}
@@ -234,7 +234,7 @@ export default function MyEntriesPage() {
                 ))}
               </div>
             ) : entries.length > 0 ? (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
                 {entries.map((recipe) => {
                   const statusInfo = getStatusDetails(recipe.rawStatus);
 
