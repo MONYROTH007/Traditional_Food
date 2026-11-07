@@ -3,7 +3,7 @@
 import { useEffect, useState, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Clock, MapPin, CheckCircle2, Utensils, Pencil, Trash2, Loader2, AlertCircle } from "lucide-react";
+import { ArrowLeft, Clock, MapPin, CheckCircle2, Utensils, Pencil, Trash2, Loader2, AlertCircle, User as UserIcon } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 import { SiteChrome } from "@/components/SiteChrome";
@@ -241,6 +241,15 @@ export default function RecipeDetailPage({
                   <>
                     <span>•</span>
                     <span>{recipe.servings}</span>
+                  </>
+                )}
+                {recipe.contributor && (
+                  <>
+                    <span>•</span>
+                    <span className="flex items-center gap-1.5 text-foreground font-medium">
+                      <UserIcon className="h-4 w-4 text-accent" />
+                      <span>អ្នករួមចំណែក (Contributed by): {recipe.contributor}</span>
+                    </span>
                   </>
                 )}
                 <Badge variant="secondary" className="ml-auto text-xs uppercase tracking-wider">
