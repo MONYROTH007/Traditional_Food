@@ -299,7 +299,7 @@ export default function EditRecipePage({
         steps: string;
         source: string | null;
         photo_url: string | null;
-        status?: string;
+        status: string;
       } = {
         title: titleTrimmed,
         title_en: titleEnTrimmed || null,
@@ -307,11 +307,8 @@ export default function EditRecipePage({
         steps: stepsTrimmed,
         source: sourceTrimmed || null,
         photo_url: updatedPhotoUrl,
+        status: "pending",
       };
-
-      if (!isReviewer) {
-        updatePayload.status = "pending";
-      }
 
       const { data: updateData, error: updateError } = await supabase
         .from("entries")
@@ -322,16 +319,16 @@ export default function EditRecipePage({
       // Check that a row actually came back
       if (updateError || !updateData || updateData.length === 0) {
         console.error("Supabase Update Error or 0 rows returned:", updateError || "No row returned from update select");
-        setGeneralError("That change wasn't saved");
+        setGeneralError("មិនអាចរក្សាទុកការកែប្រែបានទេ (That change wasn't saved. Please check your inputs and try again.)");
         setIsSubmitting(false);
         return;
       }
 
-      // Go to entry page after successful save
-      router.push(`/recipes/${resolvedParams.id}`);
+      // Go to my-entries page after successful save to view pending review status
+      router.push("/my-entries");
     } catch (err) {
       console.error("Unexpected update error:", err);
-      setGeneralError("That change wasn't saved");
+      setGeneralError("មិនអាចរក្សាទុកការកែប្រែបានទេ (That change wasn't saved. Please check your connection and try again.)");
       setIsSubmitting(false);
     }
   };

@@ -170,6 +170,26 @@ export default function RecipeDetailPage({
           </div>
         )}
 
+        {recipe && recipe.status && recipe.status !== "published" && (
+          <div className="mb-6 rounded-sm border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-foreground">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
+              <div>
+                <p className="font-semibold text-foreground">
+                  {recipe.status === "returned"
+                    ? "បានប្រគល់ត្រឡប់មកវិញ (Returned for Revisions)"
+                    : "កំពុងរង់ចាំការពិនិត្យ (Pending Curator Review)"}
+                </p>
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                  {recipe.status === "returned"
+                    ? "អ្នកគ្រប់គ្រងបានស្នើសុំឱ្យធ្វើការកែសម្រួលរូបមន្តនេះ។ សូមចុចប៊ូតុង Edit ខាងលើដើម្បីកែសម្រួល និងដាក់ស្នើម្តងទៀត។ (Curators requested edits on this recipe. Please click Edit above to update and resubmit.)"
+                    : "រូបមន្តនេះកំពុងស្ថិតក្នុងបញ្ជីរង់ចាំការពិនិត្យពីអ្នកគ្រប់គ្រង។ វានឹងបង្ហាញជាសាធារណៈបន្ទាប់ពីត្រូវបានអនុម័ត។ (This recipe is in the curation review queue and will be visible publicly once approved.)"}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {loading ? (
           <div className="animate-pulse space-y-6">
             <div className="h-72 w-full rounded-sm bg-muted" />
