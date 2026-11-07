@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   AlertCircle,
   RotateCcw,
+  User as UserIcon,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
@@ -278,9 +279,17 @@ export default function MyEntriesPage() {
                             {recipe.note}
                           </p>
 
-                          <div className="mt-4 border-t border-border/60 pt-3 text-[11px] uppercase tracking-wider text-muted-foreground">
-                            <span>From: </span>
-                            <span className="text-foreground">{recipe.place}</span>
+                          <div className="mt-4 border-t border-border/60 pt-3 text-[11px] uppercase tracking-wider text-muted-foreground flex flex-wrap items-center justify-between gap-2">
+                            <div>
+                              <span>From: </span>
+                              <span className="text-foreground">{recipe.place}</span>
+                            </div>
+                            {recipe.contributor && (
+                              <div className="flex items-center gap-1 text-foreground/80">
+                                <UserIcon className="h-3 w-3 text-accent" />
+                                <span>{recipe.contributor}</span>
+                              </div>
+                            )}
                           </div>
 
                           {/* Actionable notice for returned recipes */}

@@ -10,6 +10,7 @@ import {
   MapPin,
   Utensils,
   BookOpen,
+  User,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -167,12 +168,10 @@ export function ReviewQueue({ initialEntries }: ReviewQueueProps) {
                       <Calendar className="h-3.5 w-3.5 text-accent shrink-0" />
                       <span>{formattedDate}</span>
                     </div>
-                    {entry.source && (
-                      <div className="mt-1.5 flex items-start gap-1.5 text-[11px] text-muted-foreground">
-                        <MapPin className="h-3.5 w-3.5 text-accent shrink-0 mt-0.5" />
-                        <span className="italic">{entry.source}</span>
-                      </div>
-                    )}
+                    <div className="mt-1.5 flex items-start gap-1.5 text-[11px] text-muted-foreground">
+                      <User className="h-3.5 w-3.5 text-accent shrink-0 mt-0.5" />
+                      <span>អ្នករួមចំណែក: <strong className="text-foreground font-medium">{entry.source || "Community Contributor"}</strong></span>
+                    </div>
                   </div>
 
                   {/* Recipe Details [Question 1] */}
