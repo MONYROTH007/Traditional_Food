@@ -175,3 +175,42 @@ Since Sprint 2, we transitioned the archive from immediate self-publishing to a 
   2. *Atomic Commit Discipline:*
      - Split work into focused, granular commits (`feat: ... (AI-assisted)`) rather than large monolithic bundles, addressing client feedback regarding commit sizing.
 
+---
+
+## Sprint 3 Prompt Journal
+
+### Prompt Entry 1: Review Queue Server Gating & Decision RPC
+* **The prompt as you sent it:**  
+  `"Build the review queue page for authorized curators at /review. On the server, verify the user with supabase.rpc('is_reviewer'). If not authorized, return a 403 Access Denied screen with no entries. For reviewers, fetch pending entries ordered oldest first, render a card with dish photo, Khmer title, English title, ingredients, steps, and source. Add two action buttons: 'Approve & Publish' and 'Reject / Return'. When clicked, update the entries table status column directly to 'published' or 'returned'."`
+* **The technique by name:**  
+  *Constraint Specification with Role Gating* (Explicitly defining server-side RPC authentication, route gating, chronological sorting constraints, and UI presentation layout).
+* **What came back:**  
+  The AI produced the page layout and `ReviewQueue` component, but directly called `supabase.from('entries').update({ status: decision })` from the client.
+* **What you changed before accepting:**  
+  Rejected the direct `entries.update()` because client-side status updates violate RLS policies and allow attackers to bypass review. Replaced it with `supabase.rpc('review_entry', { entry_id, decision })` and added a strict check verifying `data === true` before updating local state.
+
+---
+
+### Prompt Entry 2: Contributor Resubmission & Edit Form
+* **The prompt as you sent it:**  
+  `"In app/recipes/[id]/edit/page.tsx, contributors whose recipes were returned need to edit and resubmit their entries. When saving edits, update the recipe title, English title, ingredients, steps, source, and dish photo. If the user is not a reviewer, make sure the status is reset to 'pending' so it goes back into the curation queue. Check that a row is returned from update and handle error states gracefully in Khmer and English."`
+* **The technique by name:**  
+  *Critique & Self-Correction (Bug Reproduction & Constraint Enforcement)* (Targeting the specific failure mode where returned recipes failed to save under Postgres RLS `WITH CHECK` policies).
+* **What came back:**  
+  The AI implemented the form update, but wrapped the status assignment in `if (!isReviewer) { updatePayload.status = "pending"; }` and returned a bare English message `"That change wasn't saved"` on failure without explaining what happened.
+* **What you changed before accepting:**  
+  Unconditionally set `updatePayload.status = "pending"` for all edits so any resubmission cleanly resets to pending review and satisfies RLS `WITH CHECK (status = 'pending')`. Replaced the English error message with a bilingual alert: `"មិនអាចរក្សាទុកការកែប្រែបានទេ (That change wasn't saved. Please check your inputs and try again.)"` and redirected the author to `/my-entries` to view the updated status badge.
+
+---
+
+### Prompt Entry 3: Contributor Attribution & Metadata Display
+* **The prompt as you sent it:**  
+  `"We need to display who contributed each recipe across the entire archive. Update RecipeCard, the recipe detail page, the review queue, and My Entries to show 'Contributed by: [Name/Provenance]'. In app/contribute/page.tsx, if the contributor doesn't fill in the source/provenance field, automatically fallback to their account full name from auth metadata so credit is preserved."`
+* **The technique by name:**  
+  *Decomposed Multi-File Implementation (Step-by-Step Context Augmentation)* (Guiding changes through data models, UI presentation components, and form handlers simultaneously).
+* **What came back:**  
+  The AI updated the components, but introduced duplicate imports in `app/my-entries/page.tsx` (`User` from `lucide-react` conflicted with `type { User } from '@supabase/supabase-js'`), causing TypeScript compilation to fail during `next build`.
+* **What you changed before accepting:**  
+  Aliased the icon import as `User as UserIcon` in `app/my-entries/page.tsx` to fix TypeScript compilation. Added fallback logic `entry.source || "Battambang Heritage Kitchen"` in `src/utils/entries.ts` so seeded heritage dishes display authentic provenance rather than blank space.
+
+
