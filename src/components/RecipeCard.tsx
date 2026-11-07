@@ -12,6 +12,7 @@ import {
   BookOpen,
   Pencil,
   Trash2,
+  User,
 } from "lucide-react";
 
 import type { Recipe } from "@/data/recipes";
@@ -117,6 +118,14 @@ export function RecipeCard({
             </div>
           </dl>
 
+          {recipe.contributor && (
+            <div className="mt-2.5 flex items-center gap-1.5 text-xs text-muted-foreground">
+              <User className="h-3.5 w-3.5 text-accent shrink-0" />
+              <span className="font-medium text-foreground">Contributed by:</span>
+              <span className="truncate italic text-foreground/90">{recipe.contributor}</span>
+            </div>
+          )}
+
           <div className="mt-4 flex items-center justify-between border-t border-border/50 pt-2 text-xs font-medium text-primary">
             <span className="uppercase tracking-wider">
               {isLocked ? "Login Required" : "View Recipe Details"}
@@ -166,6 +175,15 @@ export function RecipeCard({
                 <>
                   <span>•</span>
                   <span>{recipe.servings}</span>
+                </>
+              )}
+              {recipe.contributor && (
+                <>
+                  <span>•</span>
+                  <span className="flex items-center gap-1 text-foreground font-medium">
+                    <User className="h-3.5 w-3.5 text-accent" />
+                    <span>Contributed by: {recipe.contributor}</span>
+                  </span>
                 </>
               )}
               <Badge variant="secondary" className="ml-auto">
