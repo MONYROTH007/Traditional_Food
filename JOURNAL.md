@@ -160,3 +160,18 @@ Since Sprint 2, we transitioned the archive from immediate self-publishing to a 
   2. Update the `review_entry(entry_id uuid, decision text, feedback text default null)` RPC function to store the feedback note upon returning an entry.
   3. Add a feedback modal or note input inside `ReviewQueue.tsx` when the reviewer clicks "បដិសេធ (Reject / Return)".
   4. Render the curator's feedback note inside the "Revisions Requested" alert banner on `/my-entries` and `/recipes/[id]`.
+
+---
+
+### Entry 8: Client Feedback & Contributor Attribution
+* **Date:** November 7, 2026  
+* **Focus:** Addressing review feedback: displaying recipe contributors throughout the app and maintaining strict atomic commit standards.  
+* **AI Assistance:** AI-assisted model extension, UI component attribution badges, and form defaults.  
+* **Decisions & Implementation:**
+  1. *Contributor Attribution System:*
+     - Added `contributor` attribute to the `Recipe` TypeScript model and updated `mapEntryToRecipe` to map `entry.source` to the contributor name with fallback to `"Battambang Heritage Kitchen"`.
+     - Surfaced contributor credit on `RecipeCard.tsx` (both card preview and modal), recipe detail page (`/recipes/[id]`), `ReviewQueue.tsx`, and `/my-entries`.
+     - In `/contribute` and `/recipes/[id]/edit`, labeled the provenance input as `"Source / Contributor Name (ប្រភព ឬ ឈ្មោះអ្នករួមចំណែក)"` and auto-populated the submitter's full name if left blank so future submissions are automatically credited to the author.
+  2. *Atomic Commit Discipline:*
+     - Split work into focused, granular commits (`feat: ... (AI-assisted)`) rather than large monolithic bundles, addressing client feedback regarding commit sizing.
+
