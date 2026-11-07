@@ -20,17 +20,24 @@ A web archive dedicated to preserving and sharing traditional Cambodian dishes f
 - **Dish Photo Uploads:** Direct uploads to isolated Supabase Storage (`photos`), supporting JPG, PNG, and WebP images up to 5 MB.
 - **Public Archive Synchronization:** Newly submitted recipes appear immediately in the public archive.
 
-### 3. Row-Level Security & Access Control
+### 3. Review Queue & Curation Workflow (Sprint 3)
+- **Moderator Gating:** Submissions enter a curator review queue (`status: 'pending'`). Only verified kitchen reviewers (`reviewers` table) can approve dishes to the public archive or return them for revisions.
+- **Server-Authoritative Review:** Decisions are executed via PostgreSQL RPC (`review_entry`), ensuring callers cannot bypass the gate via direct table updates.
+- **Contributor Tracking (`/my-entries`):** Contributors track the status of their recipes with clear bilingual badges (*Pending Review / កំពុងរង់ចាំការពិនិត្យ*, *Returned for Revisions / បានប្រគល់ត្រឡប់មកវិញ*, *Published / បានផ្សព្វផ្សាយ*).
+- **Revision Resubmission:** Returned recipes can be edited and automatically resubmitted to the review queue.
+
+### 4. Row-Level Security & Access Control
 - **Strict Data Isolation:** Contributor A cannot edit or delete Contributor B's recipes or photos through either the user interface or the Supabase REST API.
-- **Postgres Row-Level Security (RLS):** Read access is open to all visitors (`public`), while `INSERT`, `UPDATE`, and `DELETE` operations strictly verify `auth.uid() = owner`.
+- **Postgres Row-Level Security (RLS):** Read access for visitors is limited to `status = 'published'`, while `INSERT`, `UPDATE`, and `DELETE` operations strictly verify `auth.uid() = owner` and enforce review status boundaries.
 - **Storage Policies:** File creation and deletion are restricted to each user's authenticated folder path.
 
-### 4. First-Class Khmer Support
+### 5. First-Class Khmer Support
 - Native typography using Google Fonts `Moul` and `Battambang`.
 - Full Unicode support across database records, input validations (`\u1780-\u17FF`), search indexes, and automatic category inference.
 
-### 5. Repository Integrity
+### 6. Repository Integrity & Development Journal
 - **Zero Secrets in Git:** All secrets remain strictly local (`.env*`); only public client identifiers are used in builds.
+- **Engineering Journal:** Full chronological development log and Sprint 3 reflection available in [JOURNAL.md](./JOURNAL.md).
 
 ---
 
