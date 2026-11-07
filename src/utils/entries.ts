@@ -101,6 +101,7 @@ export function mapEntryToRecipe(entry: EntryRow): Recipe {
   const name = entry.title_en || entry.title;
   const khmer = entry.title;
   const place = entry.source || "Battambang province";
+  const contributor = entry.source || "Battambang Heritage Kitchen";
   const note = entry.title_en
     ? `${entry.title_en} (${entry.title}) — traditional dish from ${place}.`
     : entry.title;
@@ -119,6 +120,7 @@ export function mapEntryToRecipe(entry: EntryRow): Recipe {
     instructions: instructionsList,
     owner: entry.owner ?? null,
     status: entry.status ?? "pending",
+    contributor,
   };
 }
 

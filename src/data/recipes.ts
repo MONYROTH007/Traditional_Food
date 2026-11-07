@@ -32,6 +32,7 @@ export type Recipe = {
   instructions: string[];
   owner?: string | null;
   status?: "pending" | "published" | "returned" | string | null;
+  contributor?: string | null;
 };
 
 export const recipes: Recipe[] = [
