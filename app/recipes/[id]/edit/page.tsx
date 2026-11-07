@@ -501,10 +501,10 @@ export default function EditRecipePage({
               )}
             </div>
 
-            {/* Source */}
+            {/* Source / Contributor */}
             <div>
               <label htmlFor="source" className="block text-xs font-medium uppercase tracking-wider text-foreground">
-                Source / Provenance (optional)
+                Source / Contributor Name (ប្រភព ឬ ឈ្មោះអ្នករួមចំណែក)
               </label>
               <Input
                 id="source"
@@ -520,7 +520,7 @@ export default function EditRecipePage({
                 <p className="mt-1 text-xs text-destructive">{errors.source}</p>
               ) : (
                 <p className="mt-1 text-[11px] text-muted-foreground">
-                  Who or where the recipe came from (max 150 chars).
+                  Your name, family cook, or village provenance (who or where the recipe came from, max 150 chars).
                 </p>
               )}
             </div>

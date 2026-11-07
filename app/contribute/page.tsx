@@ -243,6 +243,12 @@ export default function ContributePage() {
       const ingredientsTrimmed = ingredients.trim();
       const stepsTrimmed = steps.trim();
       const sourceTrimmed = source.trim();
+      const contributorName =
+        sourceTrimmed ||
+        user.user_metadata?.["full_name"] ||
+        user.user_metadata?.["username"] ||
+        user.email?.split("@")[0] ||
+        "Community Contributor";
 
       // Note: do NOT send status; database default sets it to 'pending'
       const { data: insertData, error: insertError } = await supabase
@@ -253,7 +259,7 @@ export default function ContributePage() {
             title_en: titleEnTrimmed || null,
             ingredients: ingredientsTrimmed,
             steps: stepsTrimmed,
-            source: sourceTrimmed || null,
+            source: contributorName,
             photo_url: photoUrl,
             owner: user.id,
           },
@@ -478,15 +484,15 @@ export default function ContributePage() {
               )}
             </div>
 
-            {/* Source */}
+            {/* Source / Contributor */}
             <div>
               <label htmlFor="source" className="block text-xs font-medium uppercase tracking-wider text-foreground">
-                Source / Provenance (optional)
+                Source / Contributor Name (ប្រភព ឬ ឈ្មោះអ្នករួមចំណែក)
               </label>
               <Input
                 id="source"
                 type="text"
-                placeholder="e.g. Family tables across Battambang town or Market seller"
+                placeholder="e.g. Grandma Sokha (Wat Kor) or Family tables across Battambang"
                 value={source}
                 onChange={(e) => {
                   setSource(e.target.value);
@@ -498,7 +504,7 @@ export default function ContributePage() {
                 <p className="mt-1 text-xs text-destructive">{errors.source}</p>
               ) : (
                 <p className="mt-1 text-[11px] text-muted-foreground">
-                  Who or where the recipe came from (max 150 chars).
+                  Your name, family cook, or village provenance (who or where the recipe came from). Defaults to your account name if left empty.
                 </p>
               )}
             </div>
