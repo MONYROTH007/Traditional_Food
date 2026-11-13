@@ -29,7 +29,7 @@ const IMAGE_MAP: Record<string, string> = {
   "prahok-ktis": prahokKtis.src,
   "song-vak": songVak.src,
   "amok-trey": amokTrey.src,
-  "kralan": kralan.src,
+  kralan: kralan.src,
   "teuk-kreung": teukKreung.src,
   "lort-jrouk": lortJrouk.src,
 };
@@ -51,7 +51,10 @@ export function resolvePhotoUrl(photoUrl: string | null | undefined): string {
   return photoUrl;
 }
 
-export function inferCategory(title: string, titleEn?: string | null): RecipeCategory {
+export function inferCategory(
+  title: string,
+  titleEn?: string | null,
+): RecipeCategory {
   const text = `${title} ${titleEn || ""}`.toLowerCase();
   if (
     text.includes("mee") ||
@@ -138,14 +141,16 @@ export function getStatusDetails(status: string | null | undefined): {
         labelEn: "Published",
         labelKm: "បានផ្សព្វផ្សាយ",
         combined: "Published / បានផ្សព្វផ្សាយ",
-        badgeClass: "border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+        badgeClass:
+          "border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
       };
     case "returned":
       return {
         labelEn: "Returned for Revisions",
         labelKm: "បានប្រគល់ត្រឡប់មកវិញ",
         combined: "Returned for Revisions / បានប្រគល់ត្រឡប់មកវិញ",
-        badgeClass: "border-rose-500/40 bg-rose-500/10 text-rose-600 dark:text-rose-400",
+        badgeClass:
+          "border-rose-500/40 bg-rose-500/10 text-rose-600 dark:text-rose-400",
       };
     case "pending":
     default:
@@ -153,8 +158,8 @@ export function getStatusDetails(status: string | null | undefined): {
         labelEn: "Pending Review",
         labelKm: "កំពុងរង់ចាំការពិនិត្យ",
         combined: "Pending Review / កំពុងរង់ចាំការពិនិត្យ",
-        badgeClass: "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400",
+        badgeClass:
+          "border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400",
       };
   }
 }
-

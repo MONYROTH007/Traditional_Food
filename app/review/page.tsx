@@ -12,7 +12,8 @@ export default async function ReviewPage() {
   const supabase = await createClient();
 
   // On the server, call supabase.rpc('is_reviewer')
-  const { data: isReviewer, error: reviewerError } = await supabase.rpc("is_reviewer");
+  const { data: isReviewer, error: reviewerError } =
+    await supabase.rpc("is_reviewer");
 
   // If it doesn't return true, show only this message and no entries: [your answer to question 5]
   if (reviewerError || isReviewer !== true) {
@@ -32,11 +33,14 @@ export default async function ReviewPage() {
           </h1>
 
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            ទំព័រនេះត្រូវបានកំណត់សម្រាប់តែអ្នកត្រួតពិនិត្យប៉ុណ្ណោះ។ សូមចូលគណនីដែលមានសិទ្ធិ ឬត្រឡប់ទៅកាន់ទំព័រដើម។
+            ទំព័រនេះត្រូវបានកំណត់សម្រាប់តែអ្នកត្រួតពិនិត្យប៉ុណ្ណោះ។
+            សូមចូលគណនីដែលមានសិទ្ធិ ឬត្រឡប់ទៅកាន់ទំព័រដើម។
           </p>
 
           <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-            This review queue is restricted to authorized kitchen reviewers only. If you believe this is an error, please contact the administrator.
+            This review queue is restricted to authorized kitchen reviewers
+            only. If you believe this is an error, please contact the
+            administrator.
           </p>
 
           <Link

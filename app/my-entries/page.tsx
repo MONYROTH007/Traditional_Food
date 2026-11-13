@@ -32,7 +32,9 @@ import type { Recipe } from "@/data/recipes";
 export default function MyEntriesPage() {
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [entries, setEntries] = useState<(Recipe & { rawStatus: string })[]>([]);
+  const [entries, setEntries] = useState<(Recipe & { rawStatus: string })[]>(
+    [],
+  );
   const [loadingEntries, setLoadingEntries] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -100,9 +102,13 @@ export default function MyEntriesPage() {
     fetchMyEntries();
   }, [user]);
 
-  const publishedCount = entries.filter((e) => e.rawStatus === "published").length;
+  const publishedCount = entries.filter(
+    (e) => e.rawStatus === "published",
+  ).length;
   const pendingCount = entries.filter((e) => e.rawStatus === "pending").length;
-  const returnedCount = entries.filter((e) => e.rawStatus === "returned").length;
+  const returnedCount = entries.filter(
+    (e) => e.rawStatus === "returned",
+  ).length;
 
   return (
     <SiteChrome>
@@ -117,12 +123,16 @@ export default function MyEntriesPage() {
               My Entries
             </h1>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Track the curation and review status of all your traditional recipes submitted to the Battambang archive.
+              Track the curation and review status of all your traditional
+              recipes submitted to the Battambang archive.
             </p>
           </div>
 
           {user && (
-            <Button asChild className="uppercase tracking-[0.18em] text-xs shrink-0">
+            <Button
+              asChild
+              className="uppercase tracking-[0.18em] text-xs shrink-0"
+            >
               <Link href="/contribute">
                 <Plus className="mr-2 h-4 w-4" />
                 Submit Recipe
@@ -135,7 +145,9 @@ export default function MyEntriesPage() {
         {authLoading ? (
           <div className="mt-12 flex flex-col items-center justify-center p-12 text-muted-foreground">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="mt-3 text-xs uppercase tracking-widest">Checking Authentication...</p>
+            <p className="mt-3 text-xs uppercase tracking-widest">
+              Checking Authentication...
+            </p>
           </div>
         ) : !user ? (
           /* Logged-out visitor gate */
@@ -143,9 +155,12 @@ export default function MyEntriesPage() {
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent/15 text-accent">
               <Lock className="h-6 w-6" />
             </div>
-            <h2 className="mt-4 font-display text-2xl text-primary">Login Required</h2>
+            <h2 className="mt-4 font-display text-2xl text-primary">
+              Login Required
+            </h2>
             <p className="mt-2 max-w-md mx-auto text-sm text-muted-foreground">
-              You must be logged in to view your submitted entries and track their review status.
+              You must be logged in to view your submitted entries and track
+              their review status.
             </p>
             <div className="mt-6 flex justify-center gap-4">
               <Button asChild className="uppercase tracking-[0.2em] text-xs">
@@ -154,10 +169,12 @@ export default function MyEntriesPage() {
                   Log In
                 </Link>
               </Button>
-              <Button asChild variant="outline" className="uppercase tracking-[0.2em] text-xs">
-                <Link href="/signup">
-                  Sign Up
-                </Link>
+              <Button
+                asChild
+                variant="outline"
+                className="uppercase tracking-[0.2em] text-xs"
+              >
+                <Link href="/signup">Sign Up</Link>
               </Button>
             </div>
           </div>
@@ -282,7 +299,9 @@ export default function MyEntriesPage() {
                           <div className="mt-4 border-t border-border/60 pt-3 text-[11px] uppercase tracking-wider text-muted-foreground flex flex-wrap items-center justify-between gap-2">
                             <div>
                               <span>From: </span>
-                              <span className="text-foreground">{recipe.place}</span>
+                              <span className="text-foreground">
+                                {recipe.place}
+                              </span>
                             </div>
                             {recipe.contributor && (
                               <div className="flex items-center gap-1 text-foreground/80">
@@ -295,9 +314,12 @@ export default function MyEntriesPage() {
                           {/* Actionable notice for returned recipes */}
                           {recipe.rawStatus === "returned" && (
                             <div className="mt-3 rounded-sm border border-rose-500/30 bg-rose-500/10 p-2.5 text-xs text-rose-700 dark:text-rose-300">
-                              <p className="font-semibold">Revisions Requested</p>
+                              <p className="font-semibold">
+                                Revisions Requested
+                              </p>
                               <p className="mt-0.5 text-[11px] text-rose-600/90 dark:text-rose-300/90">
-                                Curators requested edits. Click Edit below to update and resubmit.
+                                Curators requested edits. Click Edit below to
+                                update and resubmit.
                               </p>
                             </div>
                           )}
@@ -344,7 +366,8 @@ export default function MyEntriesPage() {
                   No Entries Found
                 </h3>
                 <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-                  You haven&apos;t contributed any traditional recipes yet. Share a family recipe from Battambang to get started!
+                  You haven&apos;t contributed any traditional recipes yet.
+                  Share a family recipe from Battambang to get started!
                 </p>
                 <Button
                   asChild

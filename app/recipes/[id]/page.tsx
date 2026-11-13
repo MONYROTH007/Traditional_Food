@@ -3,7 +3,18 @@
 import { useEffect, useState, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Clock, MapPin, CheckCircle2, Utensils, Pencil, Trash2, Loader2, AlertCircle, User as UserIcon } from "lucide-react";
+import {
+  ArrowLeft,
+  Clock,
+  MapPin,
+  CheckCircle2,
+  Utensils,
+  Pencil,
+  Trash2,
+  Loader2,
+  AlertCircle,
+  User as UserIcon,
+} from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 import { SiteChrome } from "@/components/SiteChrome";
@@ -77,7 +88,7 @@ export default function RecipeDetailPage({
     setErrorMessage(null);
 
     const confirmed = window.confirm(
-      `Are you sure you want to delete "${recipe?.name || recipe?.khmer || "this entry"}"? This action cannot be undone.`
+      `Are you sure you want to delete "${recipe?.name || recipe?.khmer || "this entry"}"? This action cannot be undone.`,
     );
     if (!confirmed) return;
 
@@ -95,7 +106,7 @@ export default function RecipeDetailPage({
       if (deleteError || !deleteData || deleteData.length === 0) {
         console.error(
           "Delete failed or 0 rows returned from delete select:",
-          deleteError || "No row returned"
+          deleteError || "No row returned",
         );
         setErrorMessage("That change wasn't saved");
         setIsDeleting(false);
@@ -111,7 +122,9 @@ export default function RecipeDetailPage({
     }
   };
 
-  const isOwner = Boolean(user && recipe && recipe.owner && user.id === recipe.owner);
+  const isOwner = Boolean(
+    user && recipe && recipe.owner && user.id === recipe.owner,
+  );
 
   return (
     <SiteChrome>
@@ -200,7 +213,9 @@ export default function RecipeDetailPage({
         ) : notFound || !recipe ? (
           <div className="flex flex-col items-center justify-center rounded-sm border border-dashed border-border py-16 text-center">
             <Utensils className="h-10 w-10 text-muted-foreground" />
-            <h2 className="mt-4 font-display text-2xl text-primary">Recipe Not Found</h2>
+            <h2 className="mt-4 font-display text-2xl text-primary">
+              Recipe Not Found
+            </h2>
             <p className="mt-2 text-sm text-muted-foreground">
               The recipe you are looking for does not exist or has been removed.
             </p>
@@ -218,7 +233,9 @@ export default function RecipeDetailPage({
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent" />
               <div className="absolute bottom-6 left-6 right-6">
-                <p className="font-display text-xl text-accent">{recipe.khmer}</p>
+                <p className="font-display text-xl text-accent">
+                  {recipe.khmer}
+                </p>
                 <h1 className="mt-1 font-display text-3xl sm:text-5xl text-primary">
                   {recipe.name}
                 </h1>
@@ -248,11 +265,16 @@ export default function RecipeDetailPage({
                     <span>•</span>
                     <span className="flex items-center gap-1.5 text-foreground font-medium">
                       <UserIcon className="h-4 w-4 text-accent" />
-                      <span>អ្នករួមចំណែក (Contributed by): {recipe.contributor}</span>
+                      <span>
+                        អ្នករួមចំណែក (Contributed by): {recipe.contributor}
+                      </span>
                     </span>
                   </>
                 )}
-                <Badge variant="secondary" className="ml-auto text-xs uppercase tracking-wider">
+                <Badge
+                  variant="secondary"
+                  className="ml-auto text-xs uppercase tracking-wider"
+                >
                   {recipe.category}
                 </Badge>
               </div>

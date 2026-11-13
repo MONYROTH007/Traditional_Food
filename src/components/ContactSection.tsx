@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Send, CheckCircle2, MessageSquare, UserCheck, Trash2, Loader2 } from "lucide-react";
+import {
+  Send,
+  CheckCircle2,
+  MessageSquare,
+  UserCheck,
+  Trash2,
+  Loader2,
+} from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -32,14 +39,16 @@ const INITIAL_NOTES: Note[] = [
   {
     id: "note-1",
     name: "Sophea Chan",
-    message: "My grandmother in Ek Phnom used to roast the ground peanuts before grinding them for Prahok Ktis. It adds an incredible aromatic depth!",
+    message:
+      "My grandmother in Ek Phnom used to roast the ground peanuts before grinding them for Prahok Ktis. It adds an incredible aromatic depth!",
     date: "Oct 8, 2026",
     owner: null,
   },
   {
     id: "note-2",
     name: "Dara Rith",
-    message: "Thank you for preserving these recipes. The Mee Kola technique listed here matches exactly how my family prepared it in Sangker.",
+    message:
+      "Thank you for preserving these recipes. The Mee Kola technique listed here matches exactly how my family prepared it in Sangker.",
     date: "Oct 5, 2026",
     owner: null,
   },
@@ -157,7 +166,9 @@ export function ContactSection() {
   };
 
   const handleDeleteNote = async (noteId: string) => {
-    const confirmed = window.confirm("Are you sure you want to delete your note?");
+    const confirmed = window.confirm(
+      "Are you sure you want to delete your note?",
+    );
     if (!confirmed) return;
 
     setNotes((prev) => prev.filter((n) => n.id !== noteId));
@@ -190,7 +201,9 @@ export function ContactSection() {
 
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {notes.map((note) => {
-            const isOwner = Boolean(user?.id && note.owner && user.id === note.owner);
+            const isOwner = Boolean(
+              user?.id && note.owner && user.id === note.owner,
+            );
 
             return (
               <article
@@ -224,7 +237,9 @@ export function ContactSection() {
                 <div className="mt-6 flex items-center justify-between border-t border-border pt-3 text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
                   <span>Submitted {note.date}</span>
                   {isOwner && (
-                    <span className="text-primary font-semibold">Your Note</span>
+                    <span className="text-primary font-semibold">
+                      Your Note
+                    </span>
                   )}
                 </div>
               </article>
@@ -245,13 +260,15 @@ export function ContactSection() {
               Write to Our Kitchen
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              If your family cooks one of these dishes another way, or if you have
-              memories and stories from Battambang&apos;s old shophouses and
-              markets, we would love to hear from you.
+              If your family cooks one of these dishes another way, or if you
+              have memories and stories from Battambang&apos;s old shophouses
+              and markets, we would love to hear from you.
             </p>
 
             <div className="mt-8 rounded-sm border border-border bg-card p-5 shadow-warm">
-              <p className="font-display text-lg text-accent">ម្ហូបខ្មែរបុរាណ</p>
+              <p className="font-display text-lg text-accent">
+                ម្ហូបខ្មែរបុរាណ
+              </p>
               <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">
                 Battambang Province, Cambodia
               </p>
@@ -272,7 +289,8 @@ export function ContactSection() {
                     <span className="mb-1 block font-display text-lg text-primary">
                       អរគុណ (Thank You)
                     </span>
-                    Your note has been saved and published to Notes to Our Kitchen above!
+                    Your note has been saved and published to Notes to Our
+                    Kitchen above!
                   </AlertDescription>
                 </Alert>
               )}

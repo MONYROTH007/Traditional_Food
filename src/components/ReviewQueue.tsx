@@ -26,9 +26,14 @@ export function ReviewQueue({ initialEntries }: ReviewQueueProps) {
   const [entries, setEntries] = useState<EntryRow[]>(initialEntries);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
-  const [loadingDecision, setLoadingDecision] = useState<"published" | "returned" | null>(null);
+  const [loadingDecision, setLoadingDecision] = useState<
+    "published" | "returned" | null
+  >(null);
 
-  const handleReview = async (entryId: string, decision: "published" | "returned") => {
+  const handleReview = async (
+    entryId: string,
+    decision: "published" | "returned",
+  ) => {
     setErrorMsg(null);
     setLoadingId(entryId);
     setLoadingDecision(decision);
@@ -44,7 +49,7 @@ export function ReviewQueue({ initialEntries }: ReviewQueueProps) {
         console.error("review_entry RPC error:", error || "returned false");
         // [Answer to Question 3]
         setErrorMsg(
-          "មិនអាចរក្សាទុកការផ្លាស់ប្តូរបានទេ។ សូមពិនិត្យមើលការតភ្ជាប់របស់អ្នក ហើយព្យាយាមម្តងទៀត។ (Unable to update entry status. Please check your connection and try again.)"
+          "មិនអាចរក្សាទុកការផ្លាស់ប្តូរបានទេ។ សូមពិនិត្យមើលការតភ្ជាប់របស់អ្នក ហើយព្យាយាមម្តងទៀត។ (Unable to update entry status. Please check your connection and try again.)",
         );
       } else {
         // If the call returns true, remove that entry from the list
@@ -54,7 +59,7 @@ export function ReviewQueue({ initialEntries }: ReviewQueueProps) {
       console.error("Unexpected error calling review_entry:", err);
       // [Answer to Question 3]
       setErrorMsg(
-        "មិនអាចរក្សាទុកការផ្លាស់ប្តូរបានទេ។ សូមពិនិត្យមើលការតភ្ជាប់របស់អ្នក ហើយព្យាយាមម្តងទៀត។ (Unable to update entry status. Please check your connection and try again.)"
+        "មិនអាចរក្សាទុកការផ្លាស់ប្តូរបានទេ។ សូមពិនិត្យមើលការតភ្ជាប់របស់អ្នក ហើយព្យាយាមម្តងទៀត។ (Unable to update entry status. Please check your connection and try again.)",
       );
     } finally {
       setLoadingId(null);
@@ -74,11 +79,13 @@ export function ReviewQueue({ initialEntries }: ReviewQueueProps) {
             ផ្ទៀងផ្ទាត់រូបមន្ត (Recipe Review Queue)
           </h1>
           <span className="inline-flex items-center rounded-sm border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground w-fit">
-            {entries.length} {entries.length === 1 ? "entry" : "entries"} pending
+            {entries.length} {entries.length === 1 ? "entry" : "entries"}{" "}
+            pending
           </span>
         </div>
         <p className="mt-3 text-sm text-muted-foreground">
-          Review community submissions from Battambang province. Approve traditional dishes for the public archive or return them for revision.
+          Review community submissions from Battambang province. Approve
+          traditional dishes for the public archive or return them for revision.
         </p>
       </div>
 
@@ -105,10 +112,12 @@ export function ReviewQueue({ initialEntries }: ReviewQueueProps) {
             គ្មានរូបមន្តរង់ចាំការពិនិត្យទេ (Queue is Empty)
           </h2>
           <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
-            រាល់រូបមន្តដែលបានដាក់ស្នើត្រូវបានពិនិត្យរួចរាល់អស់ហើយ។ សូមត្រឡប់មកពិនិត្យម្តងទៀតនៅពេលក្រោយ។
+            រាល់រូបមន្តដែលបានដាក់ស្នើត្រូវបានពិនិត្យរួចរាល់អស់ហើយ។
+            សូមត្រឡប់មកពិនិត្យម្តងទៀតនៅពេលក្រោយ។
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            All submitted recipes have been reviewed. The kitchen is all caught up!
+            All submitted recipes have been reviewed. The kitchen is all caught
+            up!
           </p>
           <Link
             href="/recipes"
@@ -170,7 +179,12 @@ export function ReviewQueue({ initialEntries }: ReviewQueueProps) {
                     </div>
                     <div className="mt-1.5 flex items-start gap-1.5 text-[11px] text-muted-foreground">
                       <User className="h-3.5 w-3.5 text-accent shrink-0 mt-0.5" />
-                      <span>អ្នករួមចំណែក: <strong className="text-foreground font-medium">{entry.source || "Community Contributor"}</strong></span>
+                      <span>
+                        អ្នករួមចំណែក:{" "}
+                        <strong className="text-foreground font-medium">
+                          {entry.source || "Community Contributor"}
+                        </strong>
+                      </span>
                     </div>
                   </div>
 

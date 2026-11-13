@@ -121,8 +121,12 @@ export function RecipeCard({
           {recipe.contributor && (
             <div className="mt-2.5 flex items-center gap-1.5 text-xs text-muted-foreground">
               <User className="h-3.5 w-3.5 text-accent shrink-0" />
-              <span className="font-medium text-foreground">Contributed by:</span>
-              <span className="truncate italic text-foreground/90">{recipe.contributor}</span>
+              <span className="font-medium text-foreground">
+                Contributed by:
+              </span>
+              <span className="truncate italic text-foreground/90">
+                {recipe.contributor}
+              </span>
             </div>
           )}
 
@@ -234,7 +238,11 @@ export function RecipeCard({
               </ol>
             </div>
 
-            {Boolean((user as { id: string })?.id && recipe.owner && (user as { id: string }).id === recipe.owner) && (
+            {Boolean(
+              (user as { id: string })?.id &&
+              recipe.owner &&
+              (user as { id: string }).id === recipe.owner,
+            ) && (
               <div className="flex items-center justify-end gap-3 border-t border-border pt-4">
                 <Button
                   variant="outline"

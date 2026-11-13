@@ -26,9 +26,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
     ...(user
       ? [{ href: "/my-entries", label: "My Entries", exact: false }]
       : []),
-    ...(isReviewer
-      ? [{ href: "/review", label: "Review", exact: false }]
-      : []),
+    ...(isReviewer ? [{ href: "/review", label: "Review", exact: false }] : []),
     { href: "/contribute", label: "Contribute", exact: false },
   ];
 
@@ -77,7 +75,8 @@ export function SiteChrome({ children }: { children: ReactNode }) {
     router.refresh();
   };
 
-  const fullName = user?.user_metadata?.["full_name"] || user?.user_metadata?.["username"];
+  const fullName =
+    user?.user_metadata?.["full_name"] || user?.user_metadata?.["username"];
 
   const displayName = fullName
     ? (fullName as string)

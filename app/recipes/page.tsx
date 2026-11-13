@@ -208,10 +208,7 @@ export default function RecipesPage() {
           <>
             <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {shown.map((r) => (
-                <RecipeCard
-                  key={r.id}
-                  recipe={r}
-                />
+                <RecipeCard key={r.id} recipe={r} />
               ))}
             </div>
 
@@ -277,7 +274,8 @@ export default function RecipesPage() {
               No entries in database
             </h3>
             <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-              There are currently no traditional food entries stored in Supabase.
+              There are currently no traditional food entries stored in
+              Supabase.
             </p>
           </div>
         ) : (

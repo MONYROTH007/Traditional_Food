@@ -1,9 +1,24 @@
 "use client";
 
-import { useState, useEffect, useRef, use, ChangeEvent, FormEvent } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  use,
+  ChangeEvent,
+  FormEvent,
+} from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Lock, LogIn, Upload, Loader2, AlertCircle, ArrowLeft, ShieldAlert } from "lucide-react";
+import {
+  Lock,
+  LogIn,
+  Upload,
+  Loader2,
+  AlertCircle,
+  ArrowLeft,
+  ShieldAlert,
+} from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
 import { SiteChrome } from "@/components/SiteChrome";
@@ -178,7 +193,10 @@ export default function EditRecipePage({
     const titleEnTrimmed = titleEn.trim();
     if (titleEnTrimmed.length > 100) {
       newErrors.title_en = "English title must be 100 characters or less.";
-    } else if (titleEnTrimmed && !/^[a-zA-Z0-9\s.,'()\-–—&!?]*$/.test(titleEnTrimmed)) {
+    } else if (
+      titleEnTrimmed &&
+      !/^[a-zA-Z0-9\s.,'()\-–—&!?]*$/.test(titleEnTrimmed)
+    ) {
       newErrors.title_en = "English title must contain Latin characters only.";
     }
 
@@ -186,8 +204,12 @@ export default function EditRecipePage({
     const ingredientsTrimmed = ingredients.trim();
     if (!ingredientsTrimmed) {
       newErrors.ingredients = "Ingredients list is required.";
-    } else if (ingredientsTrimmed.length < 10 || ingredientsTrimmed.length > 2000) {
-      newErrors.ingredients = "Ingredients must be between 10 and 2000 characters.";
+    } else if (
+      ingredientsTrimmed.length < 10 ||
+      ingredientsTrimmed.length > 2000
+    ) {
+      newErrors.ingredients =
+        "Ingredients must be between 10 and 2000 characters.";
     }
 
     // 4. steps: required, trimmed, 20-3000 characters
@@ -209,7 +231,10 @@ export default function EditRecipePage({
       const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
       const allowedExts = ["jpg", "jpeg", "png", "webp"];
       const ext = photoFile.name.split(".").pop()?.toLowerCase() || "";
-      if (!allowedTypes.includes(photoFile.type) || !allowedExts.includes(ext)) {
+      if (
+        !allowedTypes.includes(photoFile.type) ||
+        !allowedExts.includes(ext)
+      ) {
         newErrors.photo = "Only JPG, PNG, or WebP photo files are allowed.";
       } else if (photoFile.size > 5 * 1024 * 1024) {
         newErrors.photo = "Photo size must not exceed 5 MB.";
@@ -276,7 +301,8 @@ export default function EditRecipePage({
       // Check reviewer role via RPC
       let isReviewer = false;
       try {
-        const { data: reviewerData, error: rpcError } = await supabase.rpc("is_reviewer");
+        const { data: reviewerData, error: rpcError } =
+          await supabase.rpc("is_reviewer");
         if (!rpcError && reviewerData === true) {
           isReviewer = true;
         }
@@ -318,8 +344,13 @@ export default function EditRecipePage({
 
       // Check that a row actually came back
       if (updateError || !updateData || updateData.length === 0) {
-        console.error("Supabase Update Error or 0 rows returned:", updateError || "No row returned from update select");
-        setGeneralError("មិនអាចរក្សាទុកការកែប្រែបានទេ (That change wasn't saved. Please check your inputs and try again.)");
+        console.error(
+          "Supabase Update Error or 0 rows returned:",
+          updateError || "No row returned from update select",
+        );
+        setGeneralError(
+          "មិនអាចរក្សាទុកការកែប្រែបានទេ (That change wasn't saved. Please check your inputs and try again.)",
+        );
         setIsSubmitting(false);
         return;
       }
@@ -328,7 +359,9 @@ export default function EditRecipePage({
       router.push("/my-entries");
     } catch (err) {
       console.error("Unexpected update error:", err);
-      setGeneralError("មិនអាចរក្សាទុកការកែប្រែបានទេ (That change wasn't saved. Please check your connection and try again.)");
+      setGeneralError(
+        "មិនអាចរក្សាទុកការកែប្រែបានទេ (That change wasn't saved. Please check your connection and try again.)",
+      );
       setIsSubmitting(false);
     }
   };
@@ -358,14 +391,18 @@ export default function EditRecipePage({
         {authLoading || initialLoading ? (
           <div className="mt-12 flex flex-col items-center justify-center p-12 text-muted-foreground">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="mt-3 text-xs uppercase tracking-widest">Loading recipe details...</p>
+            <p className="mt-3 text-xs uppercase tracking-widest">
+              Loading recipe details...
+            </p>
           </div>
         ) : !user ? (
           <div className="mt-10 rounded-sm border border-border bg-card p-8 text-center shadow-warm">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent/15 text-accent">
               <Lock className="h-6 w-6" />
             </div>
-            <h2 className="mt-4 font-display text-2xl text-primary">Login Required</h2>
+            <h2 className="mt-4 font-display text-2xl text-primary">
+              Login Required
+            </h2>
             <p className="mt-2 text-sm text-muted-foreground">
               You must be logged in to edit recipes.
             </p>
@@ -383,13 +420,21 @@ export default function EditRecipePage({
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-destructive/15 text-destructive">
               <ShieldAlert className="h-6 w-6" />
             </div>
-            <h2 className="mt-4 font-display text-2xl text-primary">Access Denied</h2>
+            <h2 className="mt-4 font-display text-2xl text-primary">
+              Access Denied
+            </h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Only the owner of this recipe entry is authorized to edit it.
             </p>
             <div className="mt-6 flex justify-center">
-              <Button asChild variant="outline" className="uppercase tracking-[0.2em] text-xs">
-                <Link href={`/recipes/${resolvedParams.id}`}>Back to Recipe</Link>
+              <Button
+                asChild
+                variant="outline"
+                className="uppercase tracking-[0.2em] text-xs"
+              >
+                <Link href={`/recipes/${resolvedParams.id}`}>
+                  Back to Recipe
+                </Link>
               </Button>
             </div>
           </div>
@@ -400,15 +445,21 @@ export default function EditRecipePage({
                 <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
                 <div>
                   <p className="font-semibold">Update Failed</p>
-                  <p className="mt-0.5 text-xs text-destructive/90">{generalError}</p>
+                  <p className="mt-0.5 text-xs text-destructive/90">
+                    {generalError}
+                  </p>
                 </div>
               </div>
             )}
 
             {/* Title */}
             <div>
-              <label htmlFor="title" className="block text-xs font-medium uppercase tracking-wider text-foreground">
-                Dish Name in Khmer (ឈ្មោះម្ហូប) <span className="text-destructive">*</span>
+              <label
+                htmlFor="title"
+                className="block text-xs font-medium uppercase tracking-wider text-foreground"
+              >
+                Dish Name in Khmer (ឈ្មោះម្ហូប){" "}
+                <span className="text-destructive">*</span>
               </label>
               <Input
                 id="title"
@@ -416,7 +467,8 @@ export default function EditRecipePage({
                 value={title}
                 onChange={(e) => {
                   setTitle(e.target.value);
-                  if (errors.title) setErrors((prev) => ({ ...prev, title: undefined }));
+                  if (errors.title)
+                    setErrors((prev) => ({ ...prev, title: undefined }));
                 }}
                 className={`mt-2 ${errors.title ? "border-destructive focus-visible:ring-destructive" : ""}`}
               />
@@ -431,7 +483,10 @@ export default function EditRecipePage({
 
             {/* Title EN */}
             <div>
-              <label htmlFor="title_en" className="block text-xs font-medium uppercase tracking-wider text-foreground">
+              <label
+                htmlFor="title_en"
+                className="block text-xs font-medium uppercase tracking-wider text-foreground"
+              >
                 English Name (optional)
               </label>
               <Input
@@ -440,23 +495,31 @@ export default function EditRecipePage({
                 value={titleEn}
                 onChange={(e) => {
                   setTitleEn(e.target.value);
-                  if (errors.title_en) setErrors((prev) => ({ ...prev, title_en: undefined }));
+                  if (errors.title_en)
+                    setErrors((prev) => ({ ...prev, title_en: undefined }));
                 }}
                 className={`mt-2 ${errors.title_en ? "border-destructive focus-visible:ring-destructive" : ""}`}
               />
               {errors.title_en ? (
-                <p className="mt-1 text-xs text-destructive">{errors.title_en}</p>
+                <p className="mt-1 text-xs text-destructive">
+                  {errors.title_en}
+                </p>
               ) : (
                 <p className="mt-1 text-[11px] text-muted-foreground">
-                  Latin letters, numbers, and common punctuation only (max 100 chars).
+                  Latin letters, numbers, and common punctuation only (max 100
+                  chars).
                 </p>
               )}
             </div>
 
             {/* Ingredients */}
             <div>
-              <label htmlFor="ingredients" className="block text-xs font-medium uppercase tracking-wider text-foreground">
-                Ingredients (គ្រឿងផ្សំ) <span className="text-destructive">*</span>
+              <label
+                htmlFor="ingredients"
+                className="block text-xs font-medium uppercase tracking-wider text-foreground"
+              >
+                Ingredients (គ្រឿងផ្សំ){" "}
+                <span className="text-destructive">*</span>
               </label>
               <Textarea
                 id="ingredients"
@@ -464,12 +527,15 @@ export default function EditRecipePage({
                 value={ingredients}
                 onChange={(e) => {
                   setIngredients(e.target.value);
-                  if (errors.ingredients) setErrors((prev) => ({ ...prev, ingredients: undefined }));
+                  if (errors.ingredients)
+                    setErrors((prev) => ({ ...prev, ingredients: undefined }));
                 }}
                 className={`mt-2 ${errors.ingredients ? "border-destructive focus-visible:ring-destructive" : ""}`}
               />
               {errors.ingredients ? (
-                <p className="mt-1 text-xs text-destructive">{errors.ingredients}</p>
+                <p className="mt-1 text-xs text-destructive">
+                  {errors.ingredients}
+                </p>
               ) : (
                 <p className="mt-1 text-[11px] text-muted-foreground">
                   Provide the list of ingredients (10–2000 characters).
@@ -479,8 +545,12 @@ export default function EditRecipePage({
 
             {/* Steps */}
             <div>
-              <label htmlFor="steps" className="block text-xs font-medium uppercase tracking-wider text-foreground">
-                Cooking Steps (វិធីធ្វើ) <span className="text-destructive">*</span>
+              <label
+                htmlFor="steps"
+                className="block text-xs font-medium uppercase tracking-wider text-foreground"
+              >
+                Cooking Steps (វិធីធ្វើ){" "}
+                <span className="text-destructive">*</span>
               </label>
               <Textarea
                 id="steps"
@@ -488,7 +558,8 @@ export default function EditRecipePage({
                 value={steps}
                 onChange={(e) => {
                   setSteps(e.target.value);
-                  if (errors.steps) setErrors((prev) => ({ ...prev, steps: undefined }));
+                  if (errors.steps)
+                    setErrors((prev) => ({ ...prev, steps: undefined }));
                 }}
                 className={`mt-2 ${errors.steps ? "border-destructive focus-visible:ring-destructive" : ""}`}
               />
@@ -496,14 +567,18 @@ export default function EditRecipePage({
                 <p className="mt-1 text-xs text-destructive">{errors.steps}</p>
               ) : (
                 <p className="mt-1 text-[11px] text-muted-foreground">
-                  Describe how to prepare and cook the dish (20–3000 characters).
+                  Describe how to prepare and cook the dish (20–3000
+                  characters).
                 </p>
               )}
             </div>
 
             {/* Source / Contributor */}
             <div>
-              <label htmlFor="source" className="block text-xs font-medium uppercase tracking-wider text-foreground">
+              <label
+                htmlFor="source"
+                className="block text-xs font-medium uppercase tracking-wider text-foreground"
+              >
                 Source / Contributor Name (ប្រភព ឬ ឈ្មោះអ្នករួមចំណែក)
               </label>
               <Input
@@ -512,7 +587,8 @@ export default function EditRecipePage({
                 value={source}
                 onChange={(e) => {
                   setSource(e.target.value);
-                  if (errors.source) setErrors((prev) => ({ ...prev, source: undefined }));
+                  if (errors.source)
+                    setErrors((prev) => ({ ...prev, source: undefined }));
                 }}
                 className={`mt-2 ${errors.source ? "border-destructive focus-visible:ring-destructive" : ""}`}
               />
@@ -520,17 +596,21 @@ export default function EditRecipePage({
                 <p className="mt-1 text-xs text-destructive">{errors.source}</p>
               ) : (
                 <p className="mt-1 text-[11px] text-muted-foreground">
-                  Your name, family cook, or village provenance (who or where the recipe came from, max 150 chars).
+                  Your name, family cook, or village provenance (who or where
+                  the recipe came from, max 150 chars).
                 </p>
               )}
             </div>
 
             {/* Photo Upload (Optional on edit) */}
             <div>
-              <label htmlFor="photo" className="block text-xs font-medium uppercase tracking-wider text-foreground">
+              <label
+                htmlFor="photo"
+                className="block text-xs font-medium uppercase tracking-wider text-foreground"
+              >
                 Dish Photo (optional to update)
               </label>
-              
+
               <div
                 onClick={() => fileInputRef.current?.click()}
                 className={`mt-2 flex cursor-pointer flex-col items-center justify-center rounded-sm border-2 border-dashed p-6 text-center transition-colors ${
