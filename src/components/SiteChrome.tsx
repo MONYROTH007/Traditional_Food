@@ -6,6 +6,8 @@ import { useEffect, useState, type ReactNode } from "react";
 import type { User } from "@supabase/supabase-js";
 
 import { ContactSection } from "@/components/ContactSection";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useLanguage } from "@/lib/i18n";
 import { createClient } from "@/utils/supabase/client";
 
 function isActive(pathname: string, href: string, exact: boolean) {
@@ -19,15 +21,18 @@ export function SiteChrome({ children }: { children: ReactNode }) {
   const [isReviewer, setIsReviewer] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useLanguage();
 
   const links = [
-    { href: "/", label: "Home", exact: true },
-    { href: "/recipes", label: "Recipes", exact: false },
+    { href: "/", label: t("nav.home"), exact: true },
+    { href: "/recipes", label: t("nav.recipes"), exact: false },
     ...(user
-      ? [{ href: "/my-entries", label: "My Entries", exact: false }]
+      ? [{ href: "/my-entries", label: t("nav.myEntries"), exact: false }]
       : []),
-    ...(isReviewer ? [{ href: "/review", label: "Review", exact: false }] : []),
-    { href: "/contribute", label: "Contribute", exact: false },
+    ...(isReviewer
+      ? [{ href: "/review", label: t("nav.review"), exact: false }]
+      : []),
+    { href: "/contribute", label: t("nav.contribute"), exact: false },
   ];
 
   useEffect(() => {
@@ -92,10 +97,10 @@ export function SiteChrome({ children }: { children: ReactNode }) {
             onClick={() => setOpen(false)}
           >
             <span className="block font-display text-xl tracking-wide text-primary sm:text-2xl">
-              Traditional Khmer Recipes
+              {t("brand.title")}
             </span>
             <span className="block text-[0.7rem] uppercase tracking-[0.3em] text-muted-foreground">
-              Battambang Province
+              {t("brand.subtitle")}
             </span>
           </Link>
 
@@ -126,7 +131,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
                   onClick={handleLogout}
                   className="cursor-pointer text-xs md:text-sm uppercase tracking-[0.14em] lg:tracking-[0.18em] whitespace-nowrap text-muted-foreground transition-colors hover:text-primary"
                 >
-                  Logout
+                  {t("nav.logout")}
                 </button>
               </div>
             ) : (
@@ -139,7 +144,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
                       : "text-muted-foreground"
                   }`}
                 >
-                  Log In
+                  {t("nav.login")}
                 </Link>
                 <Link
                   href="/signup"
@@ -149,20 +154,25 @@ export function SiteChrome({ children }: { children: ReactNode }) {
                       : "text-muted-foreground"
                   }`}
                 >
-                  Sign Up
+                  {t("nav.signup")}
                 </Link>
               </div>
             )}
+
+            <LanguageSwitcher className="shrink-0" />
           </nav>
 
-          <button
-            type="button"
-            aria-label="Menu"
-            onClick={() => setOpen((v) => !v)}
-            className="rounded-sm border border-border px-3 py-2 text-xs uppercase tracking-[0.2em] text-muted-foreground sm:hidden"
-          >
-            Menu
-          </button>
+          <div className="flex items-center gap-2 sm:hidden">
+            <LanguageSwitcher />
+            <button
+              type="button"
+              aria-label={t("nav.menu")}
+              onClick={() => setOpen((v) => !v)}
+              className="rounded-sm border border-border px-3 py-2 text-xs uppercase tracking-[0.2em] text-muted-foreground"
+            >
+              {t("nav.menu")}
+            </button>
+          </div>
         </div>
 
         {open && (
@@ -195,7 +205,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
                   }}
                   className="border-b border-border px-5 py-3 text-left text-sm uppercase tracking-[0.18em] text-muted-foreground hover:text-primary"
                 >
-                  Logout
+                  {t("nav.logout")}
                 </button>
               </>
             ) : (
@@ -209,7 +219,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
                       : "text-muted-foreground"
                   }`}
                 >
-                  Log In
+                  {t("nav.login")}
                 </Link>
                 <Link
                   href="/signup"
@@ -220,7 +230,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
                       : "text-muted-foreground"
                   }`}
                 >
-                  Sign Up
+                  {t("nav.signup")}
                 </Link>
               </>
             )}
@@ -240,9 +250,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
           } mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-8 text-center text-sm text-muted-foreground`}
         >
           <p className="font-display text-base text-primary">សូមអញ្ជើញពិសា</p>
-          <p className="mt-2">
-            Recipes kept by families of Battambang province, Cambodia.
-          </p>
+          <p className="mt-2">{t("footer.tagline")}</p>
         </div>
       </footer>
     </div>

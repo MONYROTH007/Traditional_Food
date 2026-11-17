@@ -3,45 +3,26 @@
 import { Search, X, RotateCcw, Utensils, Plus } from "lucide-react";
 import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 import { RecipeCard } from "@/components/RecipeCard";
 import { SiteChrome } from "@/components/SiteChrome";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RECIPE_CATEGORIES, type Recipe } from "@/data/recipes";
+import { categoryLabel, useLanguage } from "@/lib/i18n";
 import { createClient } from "@/utils/supabase/client";
 import { mapEntryToRecipe, type EntryRow } from "@/utils/entries";
 
 const PER_PAGE = 6;
 
 export default function RecipesPage() {
-  const router = useRouter();
+  const { t } = useLanguage();
   const [recipesList, setRecipesList] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [page, setPage] = useState(1);
-
-  const [user, setUser] = useState<unknown | null>(null);
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user ?? null);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
 
   useEffect(() => {
     async function fetchEntries() {
@@ -125,14 +106,13 @@ export default function RecipesPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-              Battambang
+              {t("recipes.kicker")}
             </p>
             <h1 className="mt-2 font-display text-3xl text-primary sm:text-4xl">
-              The Recipes
+              {t("recipes.title")}
             </h1>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground">
-              Dishes cooked in the villages, markets and riverside kitchens of
-              Battambang province.
+              {t("recipes.intro")}
             </p>
           </div>
           <Link
@@ -140,7 +120,7 @@ export default function RecipesPage() {
             className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2.5 text-xs uppercase tracking-[0.2em] text-primary-foreground transition-colors hover:bg-primary/90 shrink-0"
           >
             <Plus className="h-4 w-4" />
-            <span>Contribute Recipe</span>
+            <span>{t("recipes.contributeCta")}</span>
           </Link>
         </div>
 
@@ -149,7 +129,7 @@ export default function RecipesPage() {
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               type="text"
-              placeholder="Search recipes, ingredients, locations..."
+              placeholder={t("recipes.searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => handleSearchChange(e.target.value)}
               className="pl-9 pr-9 text-sm"
@@ -159,7 +139,7 @@ export default function RecipesPage() {
                 type="button"
                 onClick={() => handleSearchChange("")}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
-                aria-label="Clear search query"
+                aria-label={t("recipes.clearSearch")}
               >
                 <X className="h-4 w-4" />
               </button>
@@ -168,7 +148,7 @@ export default function RecipesPage() {
 
           <div className="flex flex-wrap items-center gap-2">
             <span className="mr-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Category:
+              {t("recipes.categoryLabel")}
             </span>
             {categories.map((cat) => {
               const isActive = selectedCategory === cat;
@@ -183,7 +163,9 @@ export default function RecipesPage() {
                       : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                   }`}
                 >
-                  {cat}
+                  {cat === "All"
+                    ? t("common.categoryAll")
+                    : categoryLabel(t, cat)}
                 </button>
               );
             })}
@@ -214,7 +196,7 @@ export default function RecipesPage() {
 
             {totalPages > 1 && (
               <nav
-                aria-label="Pagination"
+                aria-label={t("recipes.pagination")}
                 className="mt-12 flex items-center justify-center gap-3 border-t border-border pt-8"
               >
                 <button
@@ -223,7 +205,7 @@ export default function RecipesPage() {
                   disabled={safePage === 1}
                   className="rounded-sm border border-border px-4 py-2 text-xs uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-primary disabled:opacity-40"
                 >
-                  Prev
+                  {t("recipes.prev")}
                 </button>
 
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(
@@ -252,17 +234,21 @@ export default function RecipesPage() {
                   disabled={safePage === totalPages}
                   className="rounded-sm border border-border px-4 py-2 text-xs uppercase tracking-[0.2em] text-muted-foreground transition-colors hover:text-primary disabled:opacity-40"
                 >
-                  Next
+                  {t("recipes.next")}
                 </button>
               </nav>
             )}
 
             <p className="mt-6 text-center text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              {totalPages > 1 ? `Page ${safePage} of ${totalPages} · ` : ""}
-              {shown.length} of {filteredRecipes.length} matching dish
-              {filteredRecipes.length === 1 ? "" : "es"}
+              {totalPages > 1
+                ? t("recipes.pageOf", { page: safePage, total: totalPages })
+                : ""}
+              {t("recipes.showing", {
+                shown: shown.length,
+                total: filteredRecipes.length,
+              })}
               {filteredRecipes.length !== recipesList.length &&
-                ` (filtered from ${recipesList.length})`}
+                t("recipes.filteredFrom", { all: recipesList.length })}
             </p>
           </>
         ) : recipesList.length === 0 ? (
@@ -271,11 +257,10 @@ export default function RecipesPage() {
               <Utensils className="h-8 w-8" />
             </div>
             <h3 className="mt-4 font-display text-xl text-primary">
-              No entries in database
+              {t("recipes.noDbTitle")}
             </h3>
             <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-              There are currently no traditional food entries stored in
-              Supabase.
+              {t("recipes.noDbText")}
             </p>
           </div>
         ) : (
@@ -284,14 +269,10 @@ export default function RecipesPage() {
               <Search className="h-8 w-8" />
             </div>
             <h3 className="mt-4 font-display text-xl text-primary">
-              No recipes found
+              {t("recipes.notFoundTitle")}
             </h3>
             <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-              We couldn't find any dishes matching "{searchQuery}"
-              {selectedCategory !== "All"
-                ? ` in category "${selectedCategory}"`
-                : ""}
-              .
+              {t("recipes.notFoundText", { query: searchQuery })}
             </p>
             <Button
               type="button"
@@ -300,7 +281,7 @@ export default function RecipesPage() {
               className="mt-6 inline-flex items-center gap-2"
             >
               <RotateCcw className="h-4 w-4" />
-              Reset Filters
+              {t("recipes.resetFilters")}
             </Button>
           </div>
         )}

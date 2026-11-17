@@ -21,22 +21,32 @@ import type { User } from "@supabase/supabase-js";
 import { SiteChrome } from "@/components/SiteChrome";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  categoryLabel,
+  localizedTitles,
+  useLanguage,
+  type MsgKey,
+} from "@/lib/i18n";
 import { createClient } from "@/utils/supabase/client";
 import {
+  getStatusBadgeClass,
   mapEntryToRecipe,
-  getStatusDetails,
+  normalizeStatus,
   type EntryRow,
 } from "@/utils/entries";
 import type { Recipe } from "@/data/recipes";
 
 export default function MyEntriesPage() {
+  const { t, lang } = useLanguage();
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [entries, setEntries] = useState<(Recipe & { rawStatus: string })[]>(
     [],
   );
   const [loadingEntries, setLoadingEntries] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // Store the message key, not the translated text, so an error already on
+  // screen re-translates when the reader switches language.
+  const [errorKey, setErrorKey] = useState<MsgKey | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -68,7 +78,7 @@ export default function MyEntriesPage() {
     async function fetchMyEntries() {
       try {
         setLoadingEntries(true);
-        setError(null);
+        setErrorKey(null);
         const supabase = createClient();
         const { data, error: fetchError } = await supabase
           .from("entries")
@@ -78,7 +88,7 @@ export default function MyEntriesPage() {
 
         if (fetchError) {
           console.error("Error fetching entries for /my-entries:", fetchError);
-          setError("Unable to load your entries. Please refresh to try again.");
+          setErrorKey("myEntries.loadError");
           setEntries([]);
         } else if (data) {
           const mapped = data.map((row: EntryRow) => {
@@ -92,7 +102,7 @@ export default function MyEntriesPage() {
         }
       } catch (err) {
         console.error("Failed to load user entries:", err);
-        setError("An unexpected error occurred while loading your entries.");
+        setErrorKey("myEntries.unexpectedLoadError");
         setEntries([]);
       } finally {
         setLoadingEntries(false);
@@ -117,14 +127,13 @@ export default function MyEntriesPage() {
         <div className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-              Contributor Dashboard
+              {t("myEntries.kicker")}
             </p>
             <h1 className="mt-2 font-display text-3xl text-primary sm:text-4xl">
-              My Entries
+              {t("myEntries.title")}
             </h1>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Track the curation and review status of all your traditional
-              recipes submitted to the Battambang archive.
+              {t("myEntries.intro")}
             </p>
           </div>
 
@@ -135,7 +144,7 @@ export default function MyEntriesPage() {
             >
               <Link href="/contribute">
                 <Plus className="mr-2 h-4 w-4" />
-                Submit Recipe
+                {t("myEntries.submit")}
               </Link>
             </Button>
           )}
@@ -146,7 +155,7 @@ export default function MyEntriesPage() {
           <div className="mt-12 flex flex-col items-center justify-center p-12 text-muted-foreground">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <p className="mt-3 text-xs uppercase tracking-widest">
-              Checking Authentication...
+              {t("common.checkingAuth")}
             </p>
           </div>
         ) : !user ? (
@@ -156,17 +165,16 @@ export default function MyEntriesPage() {
               <Lock className="h-6 w-6" />
             </div>
             <h2 className="mt-4 font-display text-2xl text-primary">
-              Login Required
+              {t("common.loginRequired")}
             </h2>
             <p className="mt-2 max-w-md mx-auto text-sm text-muted-foreground">
-              You must be logged in to view your submitted entries and track
-              their review status.
+              {t("myEntries.gateText")}
             </p>
             <div className="mt-6 flex justify-center gap-4">
               <Button asChild className="uppercase tracking-[0.2em] text-xs">
                 <Link href="/login">
                   <LogIn className="mr-2 h-4 w-4" />
-                  Log In
+                  {t("common.login")}
                 </Link>
               </Button>
               <Button
@@ -174,7 +182,7 @@ export default function MyEntriesPage() {
                 variant="outline"
                 className="uppercase tracking-[0.2em] text-xs"
               >
-                <Link href="/signup">Sign Up</Link>
+                <Link href="/signup">{t("common.signup")}</Link>
               </Button>
             </div>
           </div>
@@ -185,7 +193,7 @@ export default function MyEntriesPage() {
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               <div className="rounded-sm border border-border bg-card p-4">
                 <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                  Total Submissions
+                  {t("myEntries.total")}
                 </p>
                 <p className="mt-1 font-display text-2xl text-primary">
                   {entries.length}
@@ -195,7 +203,7 @@ export default function MyEntriesPage() {
               <div className="rounded-sm border border-amber-500/30 bg-amber-500/5 p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-[11px] uppercase tracking-wider text-amber-700 dark:text-amber-400">
-                    Pending Review
+                    {t("status.pending")}
                   </p>
                   <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                 </div>
@@ -207,7 +215,7 @@ export default function MyEntriesPage() {
               <div className="rounded-sm border border-emerald-500/30 bg-emerald-500/5 p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-[11px] uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-                    Published
+                    {t("status.published")}
                   </p>
                   <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                 </div>
@@ -219,7 +227,7 @@ export default function MyEntriesPage() {
               <div className="rounded-sm border border-rose-500/30 bg-rose-500/5 p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-[11px] uppercase tracking-wider text-rose-700 dark:text-rose-400">
-                    Returned
+                    {t("status.returned")}
                   </p>
                   <RotateCcw className="h-4 w-4 text-rose-600 dark:text-rose-400" />
                 </div>
@@ -229,10 +237,10 @@ export default function MyEntriesPage() {
               </div>
             </div>
 
-            {error && (
+            {errorKey && (
               <div className="flex items-start gap-3 rounded-sm border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
                 <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
-                <p>{error}</p>
+                <p>{t(errorKey)}</p>
               </div>
             )}
 
@@ -254,7 +262,11 @@ export default function MyEntriesPage() {
             ) : entries.length > 0 ? (
               <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
                 {entries.map((recipe) => {
-                  const statusInfo = getStatusDetails(recipe.rawStatus);
+                  const badgeClass = getStatusBadgeClass(recipe.rawStatus);
+                  const statusLabel = t(
+                    `status.${normalizeStatus(recipe.rawStatus)}`,
+                  );
+                  const titles = localizedTitles(recipe, lang);
 
                   return (
                     <article
@@ -271,7 +283,7 @@ export default function MyEntriesPage() {
                           />
                           <div className="absolute left-3 top-3">
                             <Badge variant="secondary" className="shadow-sm">
-                              {recipe.category}
+                              {categoryLabel(t, recipe.category)}
                             </Badge>
                           </div>
                         </div>
@@ -280,16 +292,18 @@ export default function MyEntriesPage() {
                         <div className="p-5">
                           {/* Plain Words Status Badge (Khmer and English) */}
                           <div
-                            className={`inline-flex items-center rounded-sm border px-2.5 py-1 text-xs font-semibold tracking-wide ${statusInfo.badgeClass}`}
+                            className={`inline-flex items-center rounded-sm border px-2.5 py-1 text-xs font-semibold tracking-wide ${badgeClass}`}
                           >
-                            <span>{statusInfo.combined}</span>
+                            <span>{statusLabel}</span>
                           </div>
 
-                          <p className="mt-3 font-display text-sm text-accent">
-                            {recipe.khmer}
-                          </p>
+                          {titles.secondary && (
+                            <p className="mt-3 font-display text-sm text-accent">
+                              {titles.secondary}
+                            </p>
+                          )}
                           <h3 className="mt-1 font-display text-xl text-primary">
-                            {recipe.name}
+                            {titles.primary}
                           </h3>
 
                           <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
@@ -298,7 +312,7 @@ export default function MyEntriesPage() {
 
                           <div className="mt-4 border-t border-border/60 pt-3 text-[11px] uppercase tracking-wider text-muted-foreground flex flex-wrap items-center justify-between gap-2">
                             <div>
-                              <span>From: </span>
+                              <span>{t("common.from")}: </span>
                               <span className="text-foreground">
                                 {recipe.place}
                               </span>
@@ -315,11 +329,10 @@ export default function MyEntriesPage() {
                           {recipe.rawStatus === "returned" && (
                             <div className="mt-3 rounded-sm border border-rose-500/30 bg-rose-500/10 p-2.5 text-xs text-rose-700 dark:text-rose-300">
                               <p className="font-semibold">
-                                Revisions Requested
+                                {t("myEntries.revisionsRequested")}
                               </p>
                               <p className="mt-0.5 text-[11px] text-rose-600/90 dark:text-rose-300/90">
-                                Curators requested edits. Click Edit below to
-                                update and resubmit.
+                                {t("myEntries.revisionsText")}
                               </p>
                             </div>
                           )}
@@ -336,7 +349,7 @@ export default function MyEntriesPage() {
                         >
                           <Link href={`/recipes/${recipe.id}`}>
                             <Eye className="mr-1.5 h-3.5 w-3.5" />
-                            View
+                            {t("common.view")}
                           </Link>
                         </Button>
 
@@ -348,7 +361,7 @@ export default function MyEntriesPage() {
                         >
                           <Link href={`/recipes/${recipe.id}/edit`}>
                             <Pencil className="mr-1.5 h-3.5 w-3.5" />
-                            Edit
+                            {t("common.edit")}
                           </Link>
                         </Button>
                       </div>
@@ -363,7 +376,7 @@ export default function MyEntriesPage() {
                   <Utensils className="h-8 w-8" />
                 </div>
                 <h3 className="mt-4 font-display text-xl text-primary">
-                  No Entries Found
+                  {t("myEntries.emptyTitle")}
                 </h3>
                 <p className="mt-2 max-w-sm text-sm text-muted-foreground">
                   You haven&apos;t contributed any traditional recipes yet.
@@ -375,7 +388,7 @@ export default function MyEntriesPage() {
                 >
                   <Link href="/contribute">
                     <Plus className="mr-2 h-4 w-4" />
-                    Submit Your First Recipe
+                    {t("myEntries.submitFirst")}
                   </Link>
                 </Button>
               </div>

@@ -12,7 +12,7 @@ This is a community archive of traditional Khmer dishes from Battambang province
 
 The primary audience is Cambodians — in Battambang and beyond — who want to find or pass down a dish the way their family or village actually makes it, plus anyone researching or teaching Khmer food culture. Decisions made with that audience in mind:
 
-- **Khmer first.** Dish titles are required in Khmer script (validated against the `ក-៿` Unicode range) before an optional English title. Status badges, review actions, and error banners are always bilingual (Khmer then English), not English-only with a Khmer afterthought.
+- **Khmer first, with a real language switcher.** The whole interface ships in both Khmer and English, and a ខ្មែរ / EN toggle in the header switches between them. Khmer is the default for every first-time visitor; the choice is remembered in `localStorage`. Dish titles are still required in Khmer script (validated against the `ក-៿` Unicode range), and contributors may optionally add English translations of the ingredients and steps — where no translation exists, English readers see the Khmer original rather than a blank. The one deliberate exception is the `/review` 403 screen and the error/404 boundaries, which stay bilingual in a single view because they render outside the language context.
 - **Phones first.** The layout is a single-column, card-based grid that reflows at `sm`/`lg` breakpoints rather than a desktop table; images lazy-load; the archive is paginated at 6 recipes per page instead of shipping the whole dataset to a mobile connection at once.
 - **Slow connections.** Client-side data fetching is scoped to exactly what the screen needs (`select('*').eq('status', 'published')` for the public list, not the whole table), and uploaded photos are capped at 5 MB.
 - **Sources are named, not anonymized by default.** Every entry carries a "Source / Contributor Name" field, shown on the recipe card, the detail page, the review queue, and the contributor's own dashboard — so a dish stays attached to the person or place it came from. If a contributor leaves it blank, it falls back to their account name rather than going uncredited.
@@ -21,10 +21,12 @@ The primary audience is Cambodians — in Battambang and beyond — who want to 
 
 **Stack:** Next.js (App Router) deployed on Vercel for the site; Supabase for auth, the Postgres database, and photo storage.
 
-**Data model** (managed in the Supabase dashboard — this repo has no checked-in migrations, so treat the project's SQL editor / dashboard as the source of truth, not this list):
+**Data model** (the base tables were created in the Supabase dashboard; later schema changes live in [`db/migrations/`](./db/migrations/) and are run by hand in the SQL editor):
 
-- `entries` — one row per recipe: `id`, `title` (Khmer), `title_en`, `ingredients`, `steps`, `source` (provenance/contributor), `photo_url`, `owner` (→ `auth.users`), `status`, `created_at`.
+- `entries` — one row per recipe: `id`, `title` (Khmer), `title_en`, `ingredients`, `steps`, `ingredients_en`, `steps_en`, `source` (provenance/contributor), `photo_url`, `owner` (→ `auth.users`), `status`, `created_at`.
 - `reviewers` — the allowlist of accounts permitted to approve or return submissions.
+
+`ingredients_en` and `steps_en` are nullable English translations added by [`001_bilingual_entries.sql`](./db/migrations/001_bilingual_entries.sql). The Khmer text in `ingredients` / `steps` stays required and authoritative; a null translation simply means the English reader sees the Khmer original. The app detects the columns being absent and saves without them, so it keeps working if that migration has not been run yet.
 
 **Three entry statuses**, surfaced everywhere with bilingual badges:
 
@@ -96,6 +98,8 @@ npm run start
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
 The anon key is a Supabase _publishable_ client key, not a secret — it's meant to ship to the browser, and it's safe only because every table it can touch is protected by the Row-Level Security policies described in Section 3.
+
+**Database migrations.** Files in [`db/migrations/`](./db/migrations/) are applied by hand: open the Supabase dashboard → SQL Editor, paste the file, and run it. They are idempotent, so re-running one is safe. Apply them in filename order; `001_bilingual_entries.sql` adds the optional English translation columns.
 
 ## 8. Submission checklist
 

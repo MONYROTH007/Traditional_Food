@@ -15,6 +15,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { dateLocale, useLanguage } from "@/lib/i18n";
 import { createClient } from "@/utils/supabase/client";
 import { resolvePhotoUrl, type EntryRow } from "@/utils/entries";
 
@@ -23,6 +24,7 @@ interface ReviewQueueProps {
 }
 
 export function ReviewQueue({ initialEntries }: ReviewQueueProps) {
+  const { t, lang } = useLanguage();
   const [entries, setEntries] = useState<EntryRow[]>(initialEntries);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [loadingId, setLoadingId] = useState<string | null>(null);
@@ -48,9 +50,7 @@ export function ReviewQueue({ initialEntries }: ReviewQueueProps) {
       if (error || data !== true) {
         console.error("review_entry RPC error:", error || "returned false");
         // [Answer to Question 3]
-        setErrorMsg(
-          "មិនអាចរក្សាទុកការផ្លាស់ប្តូរបានទេ។ សូមពិនិត្យមើលការតភ្ជាប់របស់អ្នក ហើយព្យាយាមម្តងទៀត។ (Unable to update entry status. Please check your connection and try again.)",
-        );
+        setErrorMsg(t("review.error"));
       } else {
         // If the call returns true, remove that entry from the list
         setEntries((prev) => prev.filter((item) => item.id !== entryId));
@@ -58,9 +58,7 @@ export function ReviewQueue({ initialEntries }: ReviewQueueProps) {
     } catch (err) {
       console.error("Unexpected error calling review_entry:", err);
       // [Answer to Question 3]
-      setErrorMsg(
-        "មិនអាចរក្សាទុកការផ្លាស់ប្តូរបានទេ។ សូមពិនិត្យមើលការតភ្ជាប់របស់អ្នក ហើយព្យាយាមម្តងទៀត។ (Unable to update entry status. Please check your connection and try again.)",
-      );
+      setErrorMsg(t("review.error"));
     } finally {
       setLoadingId(null);
       setLoadingDecision(null);
@@ -72,20 +70,18 @@ export function ReviewQueue({ initialEntries }: ReviewQueueProps) {
       {/* Header section */}
       <div className="border-b border-border pb-6">
         <p className="text-xs uppercase tracking-[0.3em] text-accent font-semibold">
-          Kitchen Review Queue
+          {t("review.kicker")}
         </p>
         <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="font-display text-3xl text-primary sm:text-4xl">
-            ផ្ទៀងផ្ទាត់រូបមន្ត (Recipe Review Queue)
+            {t("review.title")}
           </h1>
           <span className="inline-flex items-center rounded-sm border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground w-fit">
-            {entries.length} {entries.length === 1 ? "entry" : "entries"}{" "}
-            pending
+            {t("review.pendingCount", { count: entries.length })}
           </span>
         </div>
         <p className="mt-3 text-sm text-muted-foreground">
-          Review community submissions from Battambang province. Approve
-          traditional dishes for the public archive or return them for revision.
+          {t("review.intro")}
         </p>
       </div>
 
@@ -109,22 +105,17 @@ export function ReviewQueue({ initialEntries }: ReviewQueueProps) {
             <CheckCircle2 className="h-8 w-8 text-primary" />
           </div>
           <h2 className="mt-5 font-display text-2xl text-primary sm:text-3xl">
-            គ្មានរូបមន្តរង់ចាំការពិនិត្យទេ (Queue is Empty)
+            {t("review.emptyTitle")}
           </h2>
           <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
-            រាល់រូបមន្តដែលបានដាក់ស្នើត្រូវបានពិនិត្យរួចរាល់អស់ហើយ។
-            សូមត្រឡប់មកពិនិត្យម្តងទៀតនៅពេលក្រោយ។
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            All submitted recipes have been reviewed. The kitchen is all caught
-            up!
+            {t("review.emptyText")}
           </p>
           <Link
             href="/recipes"
             className="mt-8 inline-flex items-center gap-2 rounded-sm bg-primary px-6 py-2.5 text-xs uppercase tracking-[0.2em] text-primary-foreground transition-colors hover:bg-primary/90"
           >
             <BookOpen className="h-4 w-4" />
-            <span>Browse Public Archive</span>
+            <span>{t("review.browseArchive")}</span>
           </Link>
         </div>
       ) : (
@@ -134,14 +125,17 @@ export function ReviewQueue({ initialEntries }: ReviewQueueProps) {
             const isProcessing = loadingId === entry.id;
             const photoSrc = resolvePhotoUrl(entry.photo_url);
             const formattedDate = entry.created_at
-              ? new Date(entry.created_at).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
-              : "Recently submitted";
+              ? new Date(entry.created_at).toLocaleDateString(
+                  dateLocale(lang),
+                  {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  },
+                )
+              : t("review.recentlySubmitted");
 
             const ingredientsList = entry.ingredients
               ? entry.ingredients
@@ -209,7 +203,7 @@ export function ReviewQueue({ initialEntries }: ReviewQueueProps) {
                         <div className="rounded-sm border border-border/70 bg-background/50 p-4">
                           <p className="text-xs font-semibold uppercase tracking-wider text-primary flex items-center gap-1.5">
                             <Utensils className="h-3.5 w-3.5 text-accent" />
-                            <span>គ្រឿងផ្សំ (Ingredients)</span>
+                            <span>{t("common.ingredients")}</span>
                           </p>
                           <ul className="mt-2.5 space-y-1 text-xs text-foreground/90">
                             {ingredientsList.map((item, idx) => (
@@ -225,7 +219,7 @@ export function ReviewQueue({ initialEntries }: ReviewQueueProps) {
                         <div className="rounded-sm border border-border/70 bg-background/50 p-4">
                           <p className="text-xs font-semibold uppercase tracking-wider text-primary flex items-center gap-1.5">
                             <BookOpen className="h-3.5 w-3.5 text-accent" />
-                            <span>វិធីធ្វើ (Cooking Method)</span>
+                            <span>{t("review.cookingMethod")}</span>
                           </p>
                           <ol className="mt-2.5 space-y-1.5 text-xs text-foreground/90">
                             {stepsList.map((step, idx) => (
@@ -251,10 +245,10 @@ export function ReviewQueue({ initialEntries }: ReviewQueueProps) {
                         {isProcessing && loadingDecision === "returned" ? (
                           <>
                             <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                            <span>កំពុងប្រគល់ត្រឡប់...</span>
+                            <span>{t("review.returning")}</span>
                           </>
                         ) : (
-                          <span>បដិសេធ (Reject / Return)</span>
+                          <span>{t("review.reject")}</span>
                         )}
                       </Button>
 
@@ -268,10 +262,10 @@ export function ReviewQueue({ initialEntries }: ReviewQueueProps) {
                         {isProcessing && loadingDecision === "published" ? (
                           <>
                             <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-                            <span>កំពុងផ្សាយ...</span>
+                            <span>{t("review.publishing")}</span>
                           </>
                         ) : (
-                          <span>អនុម័ត និងផ្សាយ (Approve & Publish)</span>
+                          <span>{t("review.approve")}</span>
                         )}
                       </Button>
                     </div>

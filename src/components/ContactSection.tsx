@@ -16,13 +16,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { dateLocale, useLanguage } from "@/lib/i18n";
 import { createClient } from "@/utils/supabase/client";
 
 type Note = {
   id: string;
   name: string;
   message: string;
-  date: string;
+  /** ISO timestamp; null for a note just submitted in this session. */
+  createdAt: string | null;
   owner?: string | null;
 };
 
@@ -41,7 +43,7 @@ const INITIAL_NOTES: Note[] = [
     name: "Sophea Chan",
     message:
       "My grandmother in Ek Phnom used to roast the ground peanuts before grinding them for Prahok Ktis. It adds an incredible aromatic depth!",
-    date: "Oct 8, 2026",
+    createdAt: "2026-10-08T00:00:00.000Z",
     owner: null,
   },
   {
@@ -49,12 +51,13 @@ const INITIAL_NOTES: Note[] = [
     name: "Dara Rith",
     message:
       "Thank you for preserving these recipes. The Mee Kola technique listed here matches exactly how my family prepared it in Sangker.",
-    date: "Oct 5, 2026",
+    createdAt: "2026-10-05T00:00:00.000Z",
     owner: null,
   },
 ];
 
 export function ContactSection() {
+  const { t, lang } = useLanguage();
   const [user, setUser] = useState<User | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -94,11 +97,7 @@ export function ContactSection() {
             id: row.id,
             name: row.name,
             message: row.message,
-            date: new Date(row.created_at).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            }),
+            createdAt: row.created_at,
             owner: row.owner,
           }));
           setNotes(mapped);
@@ -119,6 +118,17 @@ export function ContactSection() {
 
   const userEmail = user?.email || "";
 
+  // Formatted at render time (not fetch time) so dates re-localize when the
+  // reader switches language.
+  const formatNoteDate = (note: Note) =>
+    note.createdAt
+      ? new Date(note.createdAt).toLocaleDateString(dateLocale(lang), {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })
+      : t("contact.justNow");
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const senderName = user ? userFullName : name.trim();
@@ -131,7 +141,7 @@ export function ContactSection() {
       id: `temp-${Date.now()}`,
       name: senderName,
       message: message.trim(),
-      date: "Just now",
+      createdAt: null,
       owner: user?.id || null,
     };
 
@@ -166,9 +176,7 @@ export function ContactSection() {
   };
 
   const handleDeleteNote = async (noteId: string) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete your note?",
-    );
+    const confirmed = window.confirm(t("contact.deleteConfirm"));
     if (!confirmed) return;
 
     setNotes((prev) => prev.filter((n) => n.id !== noteId));
@@ -188,14 +196,14 @@ export function ContactSection() {
         <div className="flex flex-col justify-between border-b border-border pb-4 sm:flex-row sm:items-end">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground font-semibold">
-              Community Contributions
+              {t("contact.communityKicker")}
             </p>
             <h2 className="mt-1 font-display text-3xl text-primary sm:text-4xl">
-              Notes to Our Kitchen
+              {t("contact.notesTitle")}
             </h2>
           </div>
           <p className="mt-2 text-xs uppercase tracking-[0.2em] text-muted-foreground sm:mt-0">
-            Stories & Dish Variations
+            {t("contact.storiesTag")}
           </p>
         </div>
 
@@ -221,8 +229,8 @@ export function ContactSection() {
                           type="button"
                           onClick={() => handleDeleteNote(note.id)}
                           className="text-destructive/80 transition-colors hover:text-destructive p-1"
-                          title="Delete your note"
-                          aria-label="Delete your note"
+                          title={t("contact.deleteNote")}
+                          aria-label={t("contact.deleteNote")}
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -235,10 +243,12 @@ export function ContactSection() {
                   </p>
                 </div>
                 <div className="mt-6 flex items-center justify-between border-t border-border pt-3 text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-                  <span>Submitted {note.date}</span>
+                  <span>
+                    {t("contact.submitted", { date: formatNoteDate(note) })}
+                  </span>
                   {isOwner && (
                     <span className="text-primary font-semibold">
-                      Your Note
+                      {t("contact.yourNote")}
                     </span>
                   )}
                 </div>
@@ -254,15 +264,13 @@ export function ContactSection() {
           {/* Left Column: Heading & Heritage Context */}
           <div className="lg:col-span-5">
             <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-              Contact Us
+              {t("contact.kicker")}
             </p>
             <h2 className="mt-1 font-display text-3xl text-primary sm:text-4xl">
-              Write to Our Kitchen
+              {t("contact.writeTitle")}
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              If your family cooks one of these dishes another way, or if you
-              have memories and stories from Battambang&apos;s old shophouses
-              and markets, we would love to hear from you.
+              {t("contact.intro")}
             </p>
 
             <div className="mt-8 rounded-sm border border-border bg-card p-5 shadow-warm">
@@ -270,11 +278,10 @@ export function ContactSection() {
                 ម្ហូបខ្មែរបុរាណ
               </p>
               <p className="mt-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                Battambang Province, Cambodia
+                {t("contact.addressTag")}
               </p>
               <p className="mt-3 border-t border-border pt-3 text-xs leading-relaxed text-muted-foreground">
-                Preserving traditional culinary heritage measure by measure,
-                passed down through generations.
+                {t("contact.preserveText")}
               </p>
             </div>
           </div>
@@ -287,10 +294,9 @@ export function ContactSection() {
                   <CheckCircle2 className="h-5 w-5 text-accent" />
                   <AlertDescription className="ml-2 text-sm leading-relaxed text-foreground">
                     <span className="mb-1 block font-display text-lg text-primary">
-                      អរគុណ (Thank You)
+                      {t("contact.thankYou")}
                     </span>
-                    Your note has been saved and published to Notes to Our
-                    Kitchen above!
+                    {t("contact.sentText")}
                   </AlertDescription>
                 </Alert>
               )}
@@ -300,12 +306,12 @@ export function ContactSection() {
                   <div className="rounded-sm border border-border bg-muted/40 p-4 space-y-3">
                     <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-accent">
                       <UserCheck className="h-4 w-4" />
-                      <span>Logged In Contributor</span>
+                      <span>{t("contact.loggedIn")}</span>
                     </div>
                     <div className="grid gap-3 sm:grid-cols-2 text-xs">
                       <div>
                         <span className="block uppercase tracking-wider text-[10px] text-muted-foreground">
-                          Full Name
+                          {t("auth.fullName")}
                         </span>
                         <span className="font-semibold text-foreground text-sm">
                           {userFullName}
@@ -313,7 +319,7 @@ export function ContactSection() {
                       </div>
                       <div>
                         <span className="block uppercase tracking-wider text-[10px] text-muted-foreground">
-                          Email
+                          {t("contact.email")}
                         </span>
                         <span className="font-medium text-foreground">
                           {userEmail}
@@ -328,14 +334,14 @@ export function ContactSection() {
                         htmlFor="contact-name"
                         className="text-xs uppercase tracking-wider text-muted-foreground"
                       >
-                        Name
+                        {t("contact.name")}
                       </Label>
                       <Input
                         id="contact-name"
                         required
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="Your name"
+                        placeholder={t("contact.namePlaceholder")}
                         className="border-border bg-background"
                       />
                     </div>
@@ -345,7 +351,7 @@ export function ContactSection() {
                         htmlFor="contact-email"
                         className="text-xs uppercase tracking-wider text-muted-foreground"
                       >
-                        Email
+                        {t("contact.email")}
                       </Label>
                       <Input
                         id="contact-email"
@@ -365,7 +371,7 @@ export function ContactSection() {
                     htmlFor="contact-message"
                     className="text-xs uppercase tracking-wider text-muted-foreground"
                   >
-                    Your Message
+                    {t("contact.yourMessage")}
                   </Label>
                   <Textarea
                     id="contact-message"
@@ -373,7 +379,7 @@ export function ContactSection() {
                     required
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Tell us how your family prepares this dish..."
+                    placeholder={t("contact.messagePlaceholder")}
                     className="resize-none border-border bg-background"
                   />
                 </div>
@@ -385,12 +391,12 @@ export function ContactSection() {
                 >
                   {isSubmitting ? (
                     <>
-                      <span>Sending...</span>
+                      <span>{t("contact.sending")}</span>
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
                     </>
                   ) : (
                     <>
-                      <span>Send Note</span>
+                      <span>{t("contact.sendNote")}</span>
                       <Send className="h-3.5 w-3.5" />
                     </>
                   )}

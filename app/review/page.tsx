@@ -49,6 +49,8 @@ export default async function ReviewPage() {
           >
             ត្រឡប់ទៅកាន់ទំព័រដើម (Back to Home)
           </Link>
+          {/* This 403 screen is a server component with no access to the
+              client-side language context, so it stays bilingual by design. */}
         </div>
       </SiteChrome>
     );

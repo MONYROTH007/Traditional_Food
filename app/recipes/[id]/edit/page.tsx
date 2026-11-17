@@ -25,14 +25,21 @@ import { SiteChrome } from "@/components/SiteChrome";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useLanguage, type MsgKey } from "@/lib/i18n";
 import { createClient } from "@/utils/supabase/client";
-import { mapEntryToRecipe, type EntryRow } from "@/utils/entries";
+import {
+  isMissingEnColumnsError,
+  mapEntryToRecipe,
+  type EntryRow,
+} from "@/utils/entries";
 
 type FieldErrors = {
   title?: string | undefined;
   title_en?: string | undefined;
   ingredients?: string | undefined;
+  ingredients_en?: string | undefined;
   steps?: string | undefined;
+  steps_en?: string | undefined;
   source?: string | undefined;
   photo?: string | undefined;
 };
@@ -45,6 +52,7 @@ export default function EditRecipePage({
   const resolvedParams = use(params);
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { t } = useLanguage();
 
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -56,14 +64,18 @@ export default function EditRecipePage({
   const [title, setTitle] = useState("");
   const [titleEn, setTitleEn] = useState("");
   const [ingredients, setIngredients] = useState("");
+  const [ingredientsEn, setIngredientsEn] = useState("");
   const [steps, setSteps] = useState("");
+  const [stepsEn, setStepsEn] = useState("");
   const [source, setSource] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
   // Validation & Submit states
   const [errors, setErrors] = useState<FieldErrors>({});
-  const [generalError, setGeneralError] = useState<string | null>(null);
+  // Store the message key, not the translated text, so an error already on
+  // screen re-translates when the reader switches language.
+  const [generalErrorKey, setGeneralErrorKey] = useState<MsgKey | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -99,13 +111,15 @@ export default function EditRecipePage({
 
         if (error || !data) {
           console.error("Error loading entry for edit:", error);
-          setGeneralError("Recipe entry not found.");
+          setGeneralErrorKey("edit.notFound");
         } else {
           const entry = data as EntryRow;
           setTitle(entry.title || "");
           setTitleEn(entry.title_en || "");
           setIngredients(entry.ingredients || "");
+          setIngredientsEn(entry.ingredients_en || "");
           setSteps(entry.steps || "");
+          setStepsEn(entry.steps_en || "");
           setSource(entry.source || "");
           setExistingOwner(entry.owner || null);
 
@@ -115,7 +129,7 @@ export default function EditRecipePage({
         }
       } catch (err) {
         console.error("Failed to fetch entry for edit:", err);
-        setGeneralError("Recipe entry not found.");
+        setGeneralErrorKey("edit.notFound");
       } finally {
         setInitialLoading(false);
       }
@@ -135,7 +149,7 @@ export default function EditRecipePage({
   const handlePhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setErrors((prev) => ({ ...prev, photo: undefined }));
-    setGeneralError(null);
+    setGeneralErrorKey(null);
 
     if (!file) {
       setPhotoFile(null);
@@ -154,7 +168,7 @@ export default function EditRecipePage({
     if (!allowedTypes.includes(file.type) || !allowedExts.includes(ext)) {
       setErrors((prev) => ({
         ...prev,
-        photo: "Only JPG, PNG, or WebP photo files are allowed.",
+        photo: t("form.errPhotoType"),
       }));
       setPhotoFile(null);
       return;
@@ -163,7 +177,7 @@ export default function EditRecipePage({
     if (file.size > 5 * 1024 * 1024) {
       setErrors((prev) => ({
         ...prev,
-        photo: "Photo file size must not exceed 5 MB.",
+        photo: t("form.errPhotoSize"),
       }));
       setPhotoFile(null);
       return;
@@ -182,48 +196,55 @@ export default function EditRecipePage({
     // 1. title: required, trimmed, 2-120 characters, must contain Khmer script
     const titleTrimmed = title.trim();
     if (!titleTrimmed) {
-      newErrors.title = "Khmer dish title is required.";
+      newErrors.title = t("form.errTitleRequired");
     } else if (titleTrimmed.length < 2 || titleTrimmed.length > 120) {
-      newErrors.title = "Title must be between 2 and 120 characters.";
+      newErrors.title = t("form.errTitleLength");
     } else if (!/[\u1780-\u17FF]/.test(titleTrimmed)) {
-      newErrors.title = "Title must contain Khmer script (e.g. ឡាបខ្មែរ).";
+      newErrors.title = t("form.errTitleKhmer");
     }
 
     // 2. title_en: optional, trimmed, 0-100 characters, Latin characters only if filled
     const titleEnTrimmed = titleEn.trim();
     if (titleEnTrimmed.length > 100) {
-      newErrors.title_en = "English title must be 100 characters or less.";
+      newErrors.title_en = t("form.errTitleEnLength");
     } else if (
       titleEnTrimmed &&
       !/^[a-zA-Z0-9\s.,'()\-–—&!?]*$/.test(titleEnTrimmed)
     ) {
-      newErrors.title_en = "English title must contain Latin characters only.";
+      newErrors.title_en = t("form.errTitleEnLatin");
     }
 
     // 3. ingredients: required, trimmed, 10-2000 characters
     const ingredientsTrimmed = ingredients.trim();
     if (!ingredientsTrimmed) {
-      newErrors.ingredients = "Ingredients list is required.";
+      newErrors.ingredients = t("form.errIngredientsRequired");
     } else if (
       ingredientsTrimmed.length < 10 ||
       ingredientsTrimmed.length > 2000
     ) {
-      newErrors.ingredients =
-        "Ingredients must be between 10 and 2000 characters.";
+      newErrors.ingredients = t("form.errIngredientsLength");
+    }
+
+    if (ingredientsEn.trim().length > 2000) {
+      newErrors.ingredients_en = t("form.errIngredientsEnLength");
     }
 
     // 4. steps: required, trimmed, 20-3000 characters
     const stepsTrimmed = steps.trim();
     if (!stepsTrimmed) {
-      newErrors.steps = "Cooking steps are required.";
+      newErrors.steps = t("form.errStepsRequired");
     } else if (stepsTrimmed.length < 20 || stepsTrimmed.length > 3000) {
-      newErrors.steps = "Steps must be between 20 and 3000 characters.";
+      newErrors.steps = t("form.errStepsLength");
+    }
+
+    if (stepsEn.trim().length > 3000) {
+      newErrors.steps_en = t("form.errStepsEnLength");
     }
 
     // 5. source: optional, trimmed, 0-150 characters
     const sourceTrimmed = source.trim();
     if (sourceTrimmed.length > 150) {
-      newErrors.source = "Source must be 150 characters or less.";
+      newErrors.source = t("form.errSourceLength");
     }
 
     // 6. photo: optional on edit. If a new photo is selected, validate it.
@@ -235,9 +256,9 @@ export default function EditRecipePage({
         !allowedTypes.includes(photoFile.type) ||
         !allowedExts.includes(ext)
       ) {
-        newErrors.photo = "Only JPG, PNG, or WebP photo files are allowed.";
+        newErrors.photo = t("form.errPhotoType");
       } else if (photoFile.size > 5 * 1024 * 1024) {
-        newErrors.photo = "Photo size must not exceed 5 MB.";
+        newErrors.photo = t("form.errPhotoSize");
       }
     }
 
@@ -247,15 +268,15 @@ export default function EditRecipePage({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setGeneralError(null);
+    setGeneralErrorKey(null);
 
     if (!user) {
-      setGeneralError("You must be logged in to update a recipe.");
+      setGeneralErrorKey("edit.mustLogin");
       return;
     }
 
     if (existingOwner && user.id !== existingOwner) {
-      setGeneralError("You do not have permission to edit this recipe.");
+      setGeneralErrorKey("edit.noPermission");
       return;
     }
 
@@ -286,7 +307,7 @@ export default function EditRecipePage({
 
         if (uploadError) {
           console.error("Supabase Storage Upload Error on Edit:", uploadError);
-          setGeneralError("That change wasn't saved");
+          setGeneralErrorKey("edit.saveFailed");
           setIsSubmitting(false);
           return;
         }
@@ -298,35 +319,18 @@ export default function EditRecipePage({
         updatedPhotoUrl = publicUrlData.publicUrl;
       }
 
-      // Check reviewer role via RPC
-      let isReviewer = false;
-      try {
-        const { data: reviewerData, error: rpcError } =
-          await supabase.rpc("is_reviewer");
-        if (!rpcError && reviewerData === true) {
-          isReviewer = true;
-        }
-      } catch (rpcErr) {
-        console.warn("Failed checking reviewer role:", rpcErr);
-        isReviewer = false;
-      }
-
-      // Update record in entries table
+      // Update record in entries table. Every edit resets the entry to
+      // 'pending' so resubmissions re-enter the review queue and satisfy the
+      // RLS WITH CHECK (status = 'pending') policy.
       const titleTrimmed = title.trim();
       const titleEnTrimmed = titleEn.trim();
       const ingredientsTrimmed = ingredients.trim();
+      const ingredientsEnTrimmed = ingredientsEn.trim();
       const stepsTrimmed = steps.trim();
+      const stepsEnTrimmed = stepsEn.trim();
       const sourceTrimmed = source.trim();
 
-      const updatePayload: {
-        title: string;
-        title_en: string | null;
-        ingredients: string;
-        steps: string;
-        source: string | null;
-        photo_url: string | null;
-        status: string;
-      } = {
+      const updatePayload = {
         title: titleTrimmed,
         title_en: titleEnTrimmed || null,
         ingredients: ingredientsTrimmed,
@@ -336,11 +340,28 @@ export default function EditRecipePage({
         status: "pending",
       };
 
-      const { data: updateData, error: updateError } = await supabase
+      let { data: updateData, error: updateError } = await supabase
         .from("entries")
-        .update(updatePayload)
+        .update({
+          ...updatePayload,
+          ingredients_en: ingredientsEnTrimmed || null,
+          steps_en: stepsEnTrimmed || null,
+        })
         .eq("id", resolvedParams.id)
         .select();
+
+      // The bilingual columns are optional: if this Supabase project has not
+      // run the migration yet, save the edit without the translations.
+      if (isMissingEnColumnsError(updateError)) {
+        console.warn(
+          "entries.ingredients_en/steps_en missing — saving without translations.",
+        );
+        ({ data: updateData, error: updateError } = await supabase
+          .from("entries")
+          .update(updatePayload)
+          .eq("id", resolvedParams.id)
+          .select());
+      }
 
       // Check that a row actually came back
       if (updateError || !updateData || updateData.length === 0) {
@@ -348,9 +369,7 @@ export default function EditRecipePage({
           "Supabase Update Error or 0 rows returned:",
           updateError || "No row returned from update select",
         );
-        setGeneralError(
-          "មិនអាចរក្សាទុកការកែប្រែបានទេ (That change wasn't saved. Please check your inputs and try again.)",
-        );
+        setGeneralErrorKey("edit.saveFailed");
         setIsSubmitting(false);
         return;
       }
@@ -359,9 +378,7 @@ export default function EditRecipePage({
       router.push("/my-entries");
     } catch (err) {
       console.error("Unexpected update error:", err);
-      setGeneralError(
-        "មិនអាចរក្សាទុកការកែប្រែបានទេ (That change wasn't saved. Please check your connection and try again.)",
-      );
+      setGeneralErrorKey("edit.saveFailedConnection");
       setIsSubmitting(false);
     }
   };
@@ -376,15 +393,15 @@ export default function EditRecipePage({
           className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-primary transition-colors mb-6"
         >
           <ArrowLeft className="h-4 w-4" />
-          Cancel and return to recipe
+          {t("edit.cancelReturn")}
         </Link>
 
         <div className="border-b border-border pb-6">
           <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-            Edit Recipe
+            {t("edit.kicker")}
           </p>
           <h1 className="mt-2 font-display text-3xl text-primary sm:text-4xl">
-            Update Entry
+            {t("edit.title")}
           </h1>
         </div>
 
@@ -392,7 +409,7 @@ export default function EditRecipePage({
           <div className="mt-12 flex flex-col items-center justify-center p-12 text-muted-foreground">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <p className="mt-3 text-xs uppercase tracking-widest">
-              Loading recipe details...
+              {t("edit.loadingDetails")}
             </p>
           </div>
         ) : !user ? (
@@ -401,16 +418,16 @@ export default function EditRecipePage({
               <Lock className="h-6 w-6" />
             </div>
             <h2 className="mt-4 font-display text-2xl text-primary">
-              Login Required
+              {t("common.loginRequired")}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              You must be logged in to edit recipes.
+              {t("edit.gateText")}
             </p>
             <div className="mt-6 flex justify-center gap-4">
               <Button asChild className="uppercase tracking-[0.2em] text-xs">
                 <Link href="/login">
                   <LogIn className="mr-2 h-4 w-4" />
-                  Log In
+                  {t("common.login")}
                 </Link>
               </Button>
             </div>
@@ -421,10 +438,10 @@ export default function EditRecipePage({
               <ShieldAlert className="h-6 w-6" />
             </div>
             <h2 className="mt-4 font-display text-2xl text-primary">
-              Access Denied
+              {t("edit.accessDenied")}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Only the owner of this recipe entry is authorized to edit it.
+              {t("edit.accessDeniedText")}
             </p>
             <div className="mt-6 flex justify-center">
               <Button
@@ -433,20 +450,20 @@ export default function EditRecipePage({
                 className="uppercase tracking-[0.2em] text-xs"
               >
                 <Link href={`/recipes/${resolvedParams.id}`}>
-                  Back to Recipe
+                  {t("edit.backToRecipe")}
                 </Link>
               </Button>
             </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-            {generalError && (
+            {generalErrorKey && (
               <div className="flex items-start gap-3 rounded-sm border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
                 <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
                 <div>
-                  <p className="font-semibold">Update Failed</p>
+                  <p className="font-semibold">{t("edit.updateFailedTitle")}</p>
                   <p className="mt-0.5 text-xs text-destructive/90">
-                    {generalError}
+                    {t(generalErrorKey)}
                   </p>
                 </div>
               </div>
@@ -458,7 +475,7 @@ export default function EditRecipePage({
                 htmlFor="title"
                 className="block text-xs font-medium uppercase tracking-wider text-foreground"
               >
-                Dish Name in Khmer (ឈ្មោះម្ហូប){" "}
+                {t("form.titleLabel")}{" "}
                 <span className="text-destructive">*</span>
               </label>
               <Input
@@ -476,7 +493,7 @@ export default function EditRecipePage({
                 <p className="mt-1 text-xs text-destructive">{errors.title}</p>
               ) : (
                 <p className="mt-1 text-[11px] text-muted-foreground">
-                  Must contain Khmer script (2–120 characters).
+                  {t("form.titleHint")}
                 </p>
               )}
             </div>
@@ -487,7 +504,7 @@ export default function EditRecipePage({
                 htmlFor="title_en"
                 className="block text-xs font-medium uppercase tracking-wider text-foreground"
               >
-                English Name (optional)
+                {t("form.titleEnLabel")}
               </label>
               <Input
                 id="title_en"
@@ -506,8 +523,7 @@ export default function EditRecipePage({
                 </p>
               ) : (
                 <p className="mt-1 text-[11px] text-muted-foreground">
-                  Latin letters, numbers, and common punctuation only (max 100
-                  chars).
+                  {t("form.titleEnHint")}
                 </p>
               )}
             </div>
@@ -518,7 +534,7 @@ export default function EditRecipePage({
                 htmlFor="ingredients"
                 className="block text-xs font-medium uppercase tracking-wider text-foreground"
               >
-                Ingredients (គ្រឿងផ្សំ){" "}
+                {t("form.ingredientsLabel")}{" "}
                 <span className="text-destructive">*</span>
               </label>
               <Textarea
@@ -538,7 +554,40 @@ export default function EditRecipePage({
                 </p>
               ) : (
                 <p className="mt-1 text-[11px] text-muted-foreground">
-                  Provide the list of ingredients (10–2000 characters).
+                  {t("form.ingredientsHint")}
+                </p>
+              )}
+            </div>
+
+            {/* Ingredients in English (optional translation) */}
+            <div>
+              <label
+                htmlFor="ingredients_en"
+                className="block text-xs font-medium uppercase tracking-wider text-foreground"
+              >
+                {t("form.ingredientsEnLabel")}
+              </label>
+              <Textarea
+                id="ingredients_en"
+                rows={5}
+                value={ingredientsEn}
+                onChange={(e) => {
+                  setIngredientsEn(e.target.value);
+                  if (errors.ingredients_en)
+                    setErrors((prev) => ({
+                      ...prev,
+                      ingredients_en: undefined,
+                    }));
+                }}
+                className={`mt-2 ${errors.ingredients_en ? "border-destructive focus-visible:ring-destructive" : ""}`}
+              />
+              {errors.ingredients_en ? (
+                <p className="mt-1 text-xs text-destructive">
+                  {errors.ingredients_en}
+                </p>
+              ) : (
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  {t("form.ingredientsEnHint")}
                 </p>
               )}
             </div>
@@ -549,7 +598,7 @@ export default function EditRecipePage({
                 htmlFor="steps"
                 className="block text-xs font-medium uppercase tracking-wider text-foreground"
               >
-                Cooking Steps (វិធីធ្វើ){" "}
+                {t("form.stepsLabel")}{" "}
                 <span className="text-destructive">*</span>
               </label>
               <Textarea
@@ -567,8 +616,37 @@ export default function EditRecipePage({
                 <p className="mt-1 text-xs text-destructive">{errors.steps}</p>
               ) : (
                 <p className="mt-1 text-[11px] text-muted-foreground">
-                  Describe how to prepare and cook the dish (20–3000
-                  characters).
+                  {t("form.stepsHint")}
+                </p>
+              )}
+            </div>
+
+            {/* Cooking steps in English (optional translation) */}
+            <div>
+              <label
+                htmlFor="steps_en"
+                className="block text-xs font-medium uppercase tracking-wider text-foreground"
+              >
+                {t("form.stepsEnLabel")}
+              </label>
+              <Textarea
+                id="steps_en"
+                rows={6}
+                value={stepsEn}
+                onChange={(e) => {
+                  setStepsEn(e.target.value);
+                  if (errors.steps_en)
+                    setErrors((prev) => ({ ...prev, steps_en: undefined }));
+                }}
+                className={`mt-2 ${errors.steps_en ? "border-destructive focus-visible:ring-destructive" : ""}`}
+              />
+              {errors.steps_en ? (
+                <p className="mt-1 text-xs text-destructive">
+                  {errors.steps_en}
+                </p>
+              ) : (
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  {t("form.stepsEnHint")}
                 </p>
               )}
             </div>
@@ -579,7 +657,7 @@ export default function EditRecipePage({
                 htmlFor="source"
                 className="block text-xs font-medium uppercase tracking-wider text-foreground"
               >
-                Source / Contributor Name (ប្រភព ឬ ឈ្មោះអ្នករួមចំណែក)
+                {t("form.sourceLabel")}
               </label>
               <Input
                 id="source"
@@ -596,8 +674,7 @@ export default function EditRecipePage({
                 <p className="mt-1 text-xs text-destructive">{errors.source}</p>
               ) : (
                 <p className="mt-1 text-[11px] text-muted-foreground">
-                  Your name, family cook, or village provenance (who or where
-                  the recipe came from, max 150 chars).
+                  {t("form.sourceHint")}
                 </p>
               )}
             </div>
@@ -608,7 +685,7 @@ export default function EditRecipePage({
                 htmlFor="photo"
                 className="block text-xs font-medium uppercase tracking-wider text-foreground"
               >
-                Dish Photo (optional to update)
+                {t("form.photoOptionalLabel")}
               </label>
 
               <div
@@ -637,8 +714,8 @@ export default function EditRecipePage({
                     />
                     <p className="mt-2 text-xs font-medium text-primary">
                       {photoFile
-                        ? `Click to change new photo (${photoFile.name})`
-                        : "Click to choose a new photo file"}
+                        ? t("form.photoChangeNew", { name: photoFile.name })
+                        : t("form.photoChooseNew")}
                     </p>
                   </div>
                 ) : (
@@ -647,10 +724,10 @@ export default function EditRecipePage({
                       <Upload className="h-6 w-6" />
                     </div>
                     <p className="mt-2 text-xs font-medium text-foreground">
-                      Click to select a new photo for this dish
+                      {t("form.photoSelectNew")}
                     </p>
                     <p className="mt-1 text-[11px] text-muted-foreground">
-                      JPG, PNG, or WebP formats supported (max 5 MB)
+                      {t("form.photoFormats")}
                     </p>
                   </div>
                 )}
@@ -670,7 +747,7 @@ export default function EditRecipePage({
                 disabled={isSubmitting}
                 className="uppercase tracking-[0.2em] text-xs"
               >
-                Cancel
+                {t("common.cancel")}
               </Button>
               <Button
                 type="submit"
@@ -680,10 +757,10 @@ export default function EditRecipePage({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving Changes...
+                    {t("edit.saving")}
                   </>
                 ) : (
-                  "Save Changes"
+                  t("edit.save")
                 )}
               </Button>
             </div>

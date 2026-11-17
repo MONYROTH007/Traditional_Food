@@ -21,6 +21,12 @@ import { SiteChrome } from "@/components/SiteChrome";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Recipe } from "@/data/recipes";
+import {
+  categoryLabel,
+  localizedBody,
+  localizedTitles,
+  useLanguage,
+} from "@/lib/i18n";
 import { createClient } from "@/utils/supabase/client";
 import { mapEntryToRecipe, type EntryRow } from "@/utils/entries";
 
@@ -31,6 +37,7 @@ export default function RecipeDetailPage({
 }) {
   const resolvedParams = use(params);
   const router = useRouter();
+  const { t, lang } = useLanguage();
 
   const [user, setUser] = useState<User | null>(null);
   const [recipe, setRecipe] = useState<Recipe | null>(null);
@@ -88,7 +95,9 @@ export default function RecipeDetailPage({
     setErrorMessage(null);
 
     const confirmed = window.confirm(
-      `Are you sure you want to delete "${recipe?.name || recipe?.khmer || "this entry"}"? This action cannot be undone.`,
+      t("detail.deleteConfirm", {
+        name: recipe?.name || recipe?.khmer || "",
+      }),
     );
     if (!confirmed) return;
 
@@ -108,7 +117,7 @@ export default function RecipeDetailPage({
           "Delete failed or 0 rows returned from delete select:",
           deleteError || "No row returned",
         );
-        setErrorMessage("That change wasn't saved");
+        setErrorMessage(t("detail.saveFailed"));
         setIsDeleting(false);
         return;
       }
@@ -117,7 +126,7 @@ export default function RecipeDetailPage({
       router.push("/recipes");
     } catch (err) {
       console.error("Unexpected error during entry deletion:", err);
-      setErrorMessage("That change wasn't saved");
+      setErrorMessage(t("detail.saveFailed"));
       setIsDeleting(false);
     }
   };
@@ -135,7 +144,7 @@ export default function RecipeDetailPage({
             className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-primary transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to all recipes
+            {t("detail.backToAll")}
           </Link>
 
           {/* Edit and Delete buttons - shown ONLY when logged-in user is the owner */}
@@ -149,7 +158,7 @@ export default function RecipeDetailPage({
               >
                 <Link href={`/recipes/${resolvedParams.id}/edit`}>
                   <Pencil className="mr-1.5 h-3.5 w-3.5" />
-                  Edit
+                  {t("common.edit")}
                 </Link>
               </Button>
 
@@ -163,12 +172,12 @@ export default function RecipeDetailPage({
                 {isDeleting ? (
                   <>
                     <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                    Deleting...
+                    {t("detail.deleting")}
                   </>
                 ) : (
                   <>
                     <Trash2 className="mr-1.5 h-3.5 w-3.5" />
-                    Delete
+                    {t("common.delete")}
                   </>
                 )}
               </Button>
@@ -190,13 +199,13 @@ export default function RecipeDetailPage({
               <div>
                 <p className="font-semibold text-foreground">
                   {recipe.status === "returned"
-                    ? "បានប្រគល់ត្រឡប់មកវិញ (Returned for Revisions)"
-                    : "កំពុងរង់ចាំការពិនិត្យ (Pending Curator Review)"}
+                    ? t("detail.returnedTitle")
+                    : t("detail.pendingTitle")}
                 </p>
                 <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                   {recipe.status === "returned"
-                    ? "អ្នកគ្រប់គ្រងបានស្នើសុំឱ្យធ្វើការកែសម្រួលរូបមន្តនេះ។ សូមចុចប៊ូតុង Edit ខាងលើដើម្បីកែសម្រួល និងដាក់ស្នើម្តងទៀត។ (Curators requested edits on this recipe. Please click Edit above to update and resubmit.)"
-                    : "រូបមន្តនេះកំពុងស្ថិតក្នុងបញ្ជីរង់ចាំការពិនិត្យពីអ្នកគ្រប់គ្រង។ វានឹងបង្ហាញជាសាធារណៈបន្ទាប់ពីត្រូវបានអនុម័ត។ (This recipe is in the curation review queue and will be visible publicly once approved.)"}
+                    ? t("detail.returnedText")
+                    : t("detail.pendingText")}
                 </p>
               </div>
             </div>
@@ -214,13 +223,13 @@ export default function RecipeDetailPage({
           <div className="flex flex-col items-center justify-center rounded-sm border border-dashed border-border py-16 text-center">
             <Utensils className="h-10 w-10 text-muted-foreground" />
             <h2 className="mt-4 font-display text-2xl text-primary">
-              Recipe Not Found
+              {t("detail.notFoundTitle")}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              The recipe you are looking for does not exist or has been removed.
+              {t("detail.notFoundText")}
             </p>
             <Button asChild className="mt-6 uppercase tracking-[0.2em] text-xs">
-              <Link href="/recipes">View All Recipes</Link>
+              <Link href="/recipes">{t("detail.viewAll")}</Link>
             </Button>
           </div>
         ) : (
@@ -233,11 +242,13 @@ export default function RecipeDetailPage({
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent" />
               <div className="absolute bottom-6 left-6 right-6">
-                <p className="font-display text-xl text-accent">
-                  {recipe.khmer}
-                </p>
+                {localizedTitles(recipe, lang).secondary && (
+                  <p className="font-display text-xl text-accent">
+                    {localizedTitles(recipe, lang).secondary}
+                  </p>
+                )}
                 <h1 className="mt-1 font-display text-3xl sm:text-5xl text-primary">
-                  {recipe.name}
+                  {localizedTitles(recipe, lang).primary}
                 </h1>
               </div>
             </div>
@@ -266,7 +277,7 @@ export default function RecipeDetailPage({
                     <span className="flex items-center gap-1.5 text-foreground font-medium">
                       <UserIcon className="h-4 w-4 text-accent" />
                       <span>
-                        អ្នករួមចំណែក (Contributed by): {recipe.contributor}
+                        {t("common.contributedBy")}: {recipe.contributor}
                       </span>
                     </span>
                   </>
@@ -275,7 +286,7 @@ export default function RecipeDetailPage({
                   variant="secondary"
                   className="ml-auto text-xs uppercase tracking-wider"
                 >
-                  {recipe.category}
+                  {categoryLabel(t, recipe.category)}
                 </Badge>
               </div>
 
@@ -287,10 +298,10 @@ export default function RecipeDetailPage({
               {/* Ingredients */}
               <div className="space-y-4">
                 <h2 className="border-b border-border pb-2 font-display text-2xl text-primary">
-                  Ingredients (គ្រឿងផ្សំ)
+                  {t("common.ingredients")}
                 </h2>
                 <ul className="grid gap-3 text-sm leading-relaxed text-foreground sm:grid-cols-2">
-                  {recipe.ingredients.map((ing, idx) => (
+                  {localizedBody(recipe, lang).ingredients.map((ing, idx) => (
                     <li
                       key={idx}
                       className="flex items-start gap-2.5 rounded-sm border border-border/60 bg-background/50 p-3"
@@ -305,10 +316,10 @@ export default function RecipeDetailPage({
               {/* Cooking Steps */}
               <div className="space-y-4">
                 <h2 className="border-b border-border pb-2 font-display text-2xl text-primary">
-                  Preparation & Cooking (វិធីធ្វើ)
+                  {t("common.cooking")}
                 </h2>
                 <ol className="space-y-4 text-sm leading-relaxed text-foreground">
-                  {recipe.instructions.map((step, idx) => (
+                  {localizedBody(recipe, lang).instructions.map((step, idx) => (
                     <li
                       key={idx}
                       className="flex gap-4 rounded-sm border border-border/60 bg-background/50 p-4"

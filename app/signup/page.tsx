@@ -9,10 +9,12 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useLanguage } from "@/lib/i18n";
 import { createClient } from "@/utils/supabase/client";
 
 export default function SignupPage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,17 +29,17 @@ export default function SignupPage() {
     setSuccess(null);
 
     if (!fullName.trim()) {
-      setError("Please enter your full name");
+      setError(t("auth.errFullName"));
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError(t("auth.errPasswordMatch"));
       return;
     }
 
     if (password.length < 6) {
-      setError("Password must be at least 6 characters");
+      setError(t("auth.errPasswordLength"));
       return;
     }
 
@@ -77,7 +79,7 @@ export default function SignupPage() {
         }
       }
 
-      setSuccess("Account created successfully! Auto logging in...");
+      setSuccess(t("auth.signupSuccess"));
       setLoading(false);
 
       setTimeout(() => {
@@ -85,9 +87,7 @@ export default function SignupPage() {
         router.refresh();
       }, 1000);
     } catch (err: unknown) {
-      setError(
-        err instanceof Error ? err.message : "An unexpected error occurred",
-      );
+      setError(err instanceof Error ? err.message : t("auth.unexpected"));
       setLoading(false);
     }
   };
@@ -97,13 +97,13 @@ export default function SignupPage() {
       <div className="mx-auto flex w-full max-w-md flex-col justify-center px-5 py-14">
         <div className="rounded-md border border-border bg-card p-6 shadow-sm sm:p-8">
           <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-            Account
+            {t("auth.kicker")}
           </p>
           <h1 className="mt-1 font-display text-2xl text-primary sm:text-3xl">
-            Sign Up
+            {t("auth.signupTitle")}
           </h1>
           <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-            Create an account to save and access traditional Khmer recipes.
+            {t("auth.signupIntro")}
           </p>
 
           {error && (
@@ -124,7 +124,7 @@ export default function SignupPage() {
                 htmlFor="fullName"
                 className="text-xs uppercase tracking-wider text-foreground"
               >
-                Full Name
+                {t("auth.fullName")}
               </Label>
               <Input
                 id="fullName"
@@ -132,7 +132,7 @@ export default function SignupPage() {
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="e.g. Sothea Chan"
+                placeholder={t("auth.fullNamePlaceholder")}
                 className="border-border bg-background"
               />
             </div>
@@ -142,7 +142,7 @@ export default function SignupPage() {
                 htmlFor="email"
                 className="text-xs uppercase tracking-wider text-foreground"
               >
-                Email Address
+                {t("auth.email")}
               </Label>
               <Input
                 id="email"
@@ -160,7 +160,7 @@ export default function SignupPage() {
                 htmlFor="password"
                 className="text-xs uppercase tracking-wider text-foreground"
               >
-                Password
+                {t("auth.password")}
               </Label>
               <Input
                 id="password"
@@ -178,7 +178,7 @@ export default function SignupPage() {
                 htmlFor="confirmPassword"
                 className="text-xs uppercase tracking-wider text-foreground"
               >
-                Confirm Password
+                {t("auth.confirmPassword")}
               </Label>
               <Input
                 id="confirmPassword"
@@ -192,17 +192,17 @@ export default function SignupPage() {
             </div>
 
             <Button type="submit" disabled={loading} className="mt-2 w-full">
-              {loading ? "Creating Account..." : "Sign Up"}
+              {loading ? t("auth.creating") : t("auth.signupTitle")}
             </Button>
           </form>
 
           <div className="mt-6 border-t border-border pt-4 text-center text-xs text-muted-foreground">
-            Already have an account?{" "}
+            {t("auth.haveAccount")}{" "}
             <Link
               href="/login"
               className="font-medium text-primary hover:underline"
             >
-              Log in
+              {t("auth.loginLink")}
             </Link>
           </div>
         </div>

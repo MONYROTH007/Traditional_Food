@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { LanguageProvider } from "@/lib/i18n";
 import "@/styles.css";
 
 export const metadata: Metadata = {
@@ -23,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="km">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -36,7 +37,9 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Moul&family=Battambang:wght@400;700&family=Cormorant+Garamond:wght@500;600&display=swap"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <LanguageProvider>{children}</LanguageProvider>
+      </body>
     </html>
   );
 }

@@ -18,20 +18,28 @@ import { SiteChrome } from "@/components/SiteChrome";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useLanguage } from "@/lib/i18n";
 import { createClient } from "@/utils/supabase/client";
-import { mapEntryToRecipe, type EntryRow } from "@/utils/entries";
+import {
+  isMissingEnColumnsError,
+  mapEntryToRecipe,
+  type EntryRow,
+} from "@/utils/entries";
 
 type FieldErrors = {
   title?: string | undefined;
   title_en?: string | undefined;
   ingredients?: string | undefined;
+  ingredients_en?: string | undefined;
   steps?: string | undefined;
+  steps_en?: string | undefined;
   source?: string | undefined;
   photo?: string | undefined;
 };
 
 export default function ContributePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { t } = useLanguage();
 
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -41,7 +49,9 @@ export default function ContributePage() {
   const [title, setTitle] = useState("");
   const [titleEn, setTitleEn] = useState("");
   const [ingredients, setIngredients] = useState("");
+  const [ingredientsEn, setIngredientsEn] = useState("");
   const [steps, setSteps] = useState("");
+  const [stepsEn, setStepsEn] = useState("");
   const [source, setSource] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -99,7 +109,7 @@ export default function ContributePage() {
     if (!allowedTypes.includes(file.type) || !allowedExts.includes(ext)) {
       setErrors((prev) => ({
         ...prev,
-        photo: "Only JPG, PNG, or WebP photo files are allowed.",
+        photo: t("form.errPhotoType"),
       }));
       setPhotoFile(null);
       if (photoPreview) URL.revokeObjectURL(photoPreview);
@@ -110,7 +120,7 @@ export default function ContributePage() {
     if (file.size > 5 * 1024 * 1024) {
       setErrors((prev) => ({
         ...prev,
-        photo: "Photo file size must not exceed 5 MB.",
+        photo: t("form.errPhotoSize"),
       }));
       setPhotoFile(null);
       if (photoPreview) URL.revokeObjectURL(photoPreview);
@@ -128,48 +138,55 @@ export default function ContributePage() {
 
     const titleTrimmed = title.trim();
     if (!titleTrimmed) {
-      newErrors.title = "Khmer dish title is required.";
+      newErrors.title = t("form.errTitleRequired");
     } else if (titleTrimmed.length < 2 || titleTrimmed.length > 120) {
-      newErrors.title = "Title must be between 2 and 120 characters.";
+      newErrors.title = t("form.errTitleLength");
     } else if (!/[\u1780-\u17FF]/.test(titleTrimmed)) {
-      newErrors.title = "Title must contain Khmer script (e.g. ឡាបខ្មែរ).";
+      newErrors.title = t("form.errTitleKhmer");
     }
 
     const titleEnTrimmed = titleEn.trim();
     if (titleEnTrimmed.length > 100) {
-      newErrors.title_en = "English title must be 100 characters or less.";
+      newErrors.title_en = t("form.errTitleEnLength");
     } else if (
       titleEnTrimmed &&
       !/^[a-zA-Z0-9\s.,'()\-–—&!?]*$/.test(titleEnTrimmed)
     ) {
-      newErrors.title_en = "English title must contain Latin characters only.";
+      newErrors.title_en = t("form.errTitleEnLatin");
     }
 
     const ingredientsTrimmed = ingredients.trim();
     if (!ingredientsTrimmed) {
-      newErrors.ingredients = "Ingredients list is required.";
+      newErrors.ingredients = t("form.errIngredientsRequired");
     } else if (
       ingredientsTrimmed.length < 10 ||
       ingredientsTrimmed.length > 2000
     ) {
-      newErrors.ingredients =
-        "Ingredients must be between 10 and 2000 characters.";
+      newErrors.ingredients = t("form.errIngredientsLength");
+    }
+
+    if (ingredientsEn.trim().length > 2000) {
+      newErrors.ingredients_en = t("form.errIngredientsEnLength");
     }
 
     const stepsTrimmed = steps.trim();
     if (!stepsTrimmed) {
-      newErrors.steps = "Cooking steps are required.";
+      newErrors.steps = t("form.errStepsRequired");
     } else if (stepsTrimmed.length < 20 || stepsTrimmed.length > 3000) {
-      newErrors.steps = "Steps must be between 20 and 3000 characters.";
+      newErrors.steps = t("form.errStepsLength");
+    }
+
+    if (stepsEn.trim().length > 3000) {
+      newErrors.steps_en = t("form.errStepsEnLength");
     }
 
     const sourceTrimmed = source.trim();
     if (sourceTrimmed.length > 150) {
-      newErrors.source = "Source must be 150 characters or less.";
+      newErrors.source = t("form.errSourceLength");
     }
 
     if (!photoFile) {
-      newErrors.photo = "A photo of the dish is required.";
+      newErrors.photo = t("form.errPhotoRequired");
     } else {
       const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
       const allowedExts = ["jpg", "jpeg", "png", "webp"];
@@ -178,9 +195,9 @@ export default function ContributePage() {
         !allowedTypes.includes(photoFile.type) ||
         !allowedExts.includes(ext)
       ) {
-        newErrors.photo = "Only JPG, PNG, or WebP photo files are allowed.";
+        newErrors.photo = t("form.errPhotoType");
       } else if (photoFile.size > 5 * 1024 * 1024) {
-        newErrors.photo = "Photo size must not exceed 5 MB.";
+        newErrors.photo = t("form.errPhotoSize");
       }
     }
 
@@ -192,7 +209,9 @@ export default function ContributePage() {
     setTitle("");
     setTitleEn("");
     setIngredients("");
+    setIngredientsEn("");
     setSteps("");
+    setStepsEn("");
     setSource("");
     setPhotoFile(null);
     if (photoPreview) URL.revokeObjectURL(photoPreview);
@@ -207,7 +226,7 @@ export default function ContributePage() {
     setSuccessMessage(null);
 
     if (!user) {
-      setGeneralError("You must be logged in to submit a recipe.");
+      setGeneralError(t("contribute.mustLogin"));
       return;
     }
 
@@ -235,9 +254,7 @@ export default function ContributePage() {
 
       if (uploadError) {
         console.error("Supabase Storage Upload Error:", uploadError);
-        setGeneralError(
-          "Photo upload failed. Please verify your internet connection or try another photo.",
-        );
+        setGeneralError(t("contribute.uploadFailed"));
         setIsSubmitting(false);
         return;
       }
@@ -251,7 +268,9 @@ export default function ContributePage() {
       const titleTrimmed = title.trim();
       const titleEnTrimmed = titleEn.trim();
       const ingredientsTrimmed = ingredients.trim();
+      const ingredientsEnTrimmed = ingredientsEn.trim();
       const stepsTrimmed = steps.trim();
+      const stepsEnTrimmed = stepsEn.trim();
       const sourceTrimmed = source.trim();
       const contributorName =
         sourceTrimmed ||
@@ -261,27 +280,44 @@ export default function ContributePage() {
         "Community Contributor";
 
       // Note: do NOT send status; database default sets it to 'pending'
-      const { data: insertData, error: insertError } = await supabase
+      const baseRow = {
+        title: titleTrimmed,
+        title_en: titleEnTrimmed || null,
+        ingredients: ingredientsTrimmed,
+        steps: stepsTrimmed,
+        source: contributorName,
+        photo_url: photoUrl,
+        owner: user.id,
+      };
+
+      let { data: insertData, error: insertError } = await supabase
         .from("entries")
         .insert([
           {
-            title: titleTrimmed,
-            title_en: titleEnTrimmed || null,
-            ingredients: ingredientsTrimmed,
-            steps: stepsTrimmed,
-            source: contributorName,
-            photo_url: photoUrl,
-            owner: user.id,
+            ...baseRow,
+            ingredients_en: ingredientsEnTrimmed || null,
+            steps_en: stepsEnTrimmed || null,
           },
         ])
         .select()
         .single();
 
+      // The bilingual columns are optional: if this Supabase project has not
+      // run the migration yet, save the entry without the translations.
+      if (isMissingEnColumnsError(insertError)) {
+        console.warn(
+          "entries.ingredients_en/steps_en missing — saving without translations.",
+        );
+        ({ data: insertData, error: insertError } = await supabase
+          .from("entries")
+          .insert([baseRow])
+          .select()
+          .single());
+      }
+
       if (insertError) {
         console.error("Supabase DB Insert Error:", insertError);
-        setGeneralError(
-          "Unable to save your entry. Please check your information and try again.",
-        );
+        setGeneralError(t("contribute.insertFailed"));
         setIsSubmitting(false);
         return;
       }
@@ -291,12 +327,12 @@ export default function ContributePage() {
         handleResetForm();
         setIsSubmitting(false);
         setSuccessMessage(
-          `Submission Received! Your dish "${newRecipe.name}" has been submitted to the Battambang Food Archive curators. Curators usually review family recipes within 1–3 business days to verify culinary provenance, ingredient measurements, and photo quality.`,
+          t("contribute.successBody", { name: newRecipe.name }),
         );
       }
     } catch (err) {
       console.error("Unexpected submission error:", err);
-      setGeneralError("An unexpected error occurred. Please try again.");
+      setGeneralError(t("contribute.unexpected"));
       setIsSubmitting(false);
     }
   };
@@ -307,14 +343,13 @@ export default function ContributePage() {
         <div className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-              Heritage Archive
+              {t("contribute.kicker")}
             </p>
             <h1 className="mt-2 font-display text-3xl text-primary sm:text-4xl">
-              Contribute a Recipe
+              {t("contribute.title")}
             </h1>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Share a traditional Khmer dish from your family or village to be
-              submitted for curation in the Battambang archive.
+              {t("contribute.intro")}
             </p>
           </div>
 
@@ -326,7 +361,7 @@ export default function ContributePage() {
             >
               <Link href="/my-entries">
                 <ListOrdered className="mr-2 h-4 w-4" />
-                View My Entries
+                {t("contribute.viewMyEntries")}
               </Link>
             </Button>
           )}
@@ -339,7 +374,7 @@ export default function ContributePage() {
               <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
               <div className="space-y-1">
                 <p className="font-semibold text-foreground">
-                  Submission Received
+                  {t("contribute.received")}
                 </p>
                 <p className="text-xs leading-relaxed text-muted-foreground">
                   {successMessage}
@@ -352,7 +387,7 @@ export default function ContributePage() {
                 size="sm"
                 className="text-xs uppercase tracking-wider"
               >
-                <Link href="/my-entries">Go to My Entries →</Link>
+                <Link href="/my-entries">{t("contribute.goToMyEntries")}</Link>
               </Button>
             </div>
           </div>
@@ -362,7 +397,7 @@ export default function ContributePage() {
           <div className="mt-12 flex flex-col items-center justify-center p-12 text-muted-foreground">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <p className="mt-3 text-xs uppercase tracking-widest">
-              Checking Authentication...
+              {t("common.checkingAuth")}
             </p>
           </div>
         ) : !user ? (
@@ -371,17 +406,16 @@ export default function ContributePage() {
               <Lock className="h-6 w-6" />
             </div>
             <h2 className="mt-4 font-display text-2xl text-primary">
-              Login Required
+              {t("common.loginRequired")}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Sign up or log in to submit your traditional recipes to the
-              Battambang archive and track their curation.
+              {t("contribute.gateText")}
             </p>
             <div className="mt-6 flex justify-center gap-4">
               <Button asChild className="uppercase tracking-[0.2em] text-xs">
                 <Link href="/login">
                   <LogIn className="mr-2 h-4 w-4" />
-                  Log In
+                  {t("common.login")}
                 </Link>
               </Button>
               <Button
@@ -389,7 +423,7 @@ export default function ContributePage() {
                 variant="outline"
                 className="uppercase tracking-[0.2em] text-xs"
               >
-                <Link href="/signup">Sign Up</Link>
+                <Link href="/signup">{t("common.signup")}</Link>
               </Button>
             </div>
           </div>
@@ -399,7 +433,9 @@ export default function ContributePage() {
               <div className="flex items-start gap-3 rounded-sm border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
                 <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
                 <div>
-                  <p className="font-semibold">Save Failed</p>
+                  <p className="font-semibold">
+                    {t("contribute.saveFailedTitle")}
+                  </p>
                   <p className="mt-0.5 text-xs text-destructive/90">
                     {generalError}
                   </p>
@@ -413,13 +449,13 @@ export default function ContributePage() {
                 htmlFor="title"
                 className="block text-xs font-medium uppercase tracking-wider text-foreground"
               >
-                Dish Name in Khmer (ឈ្មោះម្ហូប){" "}
+                {t("form.titleLabel")}{" "}
                 <span className="text-destructive">*</span>
               </label>
               <Input
                 id="title"
                 type="text"
-                placeholder="e.g. ឡាបខ្មែរ ឬ អាម៉ុកត្រី"
+                placeholder={t("form.titlePlaceholder")}
                 value={title}
                 onChange={(e) => {
                   setTitle(e.target.value);
@@ -432,7 +468,7 @@ export default function ContributePage() {
                 <p className="mt-1 text-xs text-destructive">{errors.title}</p>
               ) : (
                 <p className="mt-1 text-[11px] text-muted-foreground">
-                  Must contain Khmer script (2–120 characters).
+                  {t("form.titleHint")}
                 </p>
               )}
             </div>
@@ -443,12 +479,12 @@ export default function ContributePage() {
                 htmlFor="title_en"
                 className="block text-xs font-medium uppercase tracking-wider text-foreground"
               >
-                English Name (optional)
+                {t("form.titleEnLabel")}
               </label>
               <Input
                 id="title_en"
                 type="text"
-                placeholder="e.g. Larb Khmer or Fish Amok"
+                placeholder={t("form.titleEnPlaceholder")}
                 value={titleEn}
                 onChange={(e) => {
                   setTitleEn(e.target.value);
@@ -463,8 +499,7 @@ export default function ContributePage() {
                 </p>
               ) : (
                 <p className="mt-1 text-[11px] text-muted-foreground">
-                  Latin letters, numbers, and common punctuation only (max 100
-                  chars).
+                  {t("form.titleEnHint")}
                 </p>
               )}
             </div>
@@ -475,16 +510,13 @@ export default function ContributePage() {
                 htmlFor="ingredients"
                 className="block text-xs font-medium uppercase tracking-wider text-foreground"
               >
-                Ingredients (គ្រឿងផ្សំ){" "}
+                {t("form.ingredientsLabel")}{" "}
                 <span className="text-destructive">*</span>
               </label>
               <Textarea
                 id="ingredients"
                 rows={5}
-                placeholder="List ingredients line by line, e.g.:
-400g lean beef or pork, finely minced
-2 tbsp toasted rice powder
-3 tbsp fresh lime juice"
+                placeholder={t("form.ingredientsPlaceholder")}
                 value={ingredients}
                 onChange={(e) => {
                   setIngredients(e.target.value);
@@ -499,7 +531,40 @@ export default function ContributePage() {
                 </p>
               ) : (
                 <p className="mt-1 text-[11px] text-muted-foreground">
-                  Provide the list of ingredients (10–2000 characters).
+                  {t("form.ingredientsHint")}
+                </p>
+              )}
+            </div>
+
+            {/* Ingredients in English (optional translation) */}
+            <div>
+              <label
+                htmlFor="ingredients_en"
+                className="block text-xs font-medium uppercase tracking-wider text-foreground"
+              >
+                {t("form.ingredientsEnLabel")}
+              </label>
+              <Textarea
+                id="ingredients_en"
+                rows={5}
+                value={ingredientsEn}
+                onChange={(e) => {
+                  setIngredientsEn(e.target.value);
+                  if (errors.ingredients_en)
+                    setErrors((prev) => ({
+                      ...prev,
+                      ingredients_en: undefined,
+                    }));
+                }}
+                className={`mt-2 ${errors.ingredients_en ? "border-destructive focus-visible:ring-destructive" : ""}`}
+              />
+              {errors.ingredients_en ? (
+                <p className="mt-1 text-xs text-destructive">
+                  {errors.ingredients_en}
+                </p>
+              ) : (
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  {t("form.ingredientsEnHint")}
                 </p>
               )}
             </div>
@@ -510,15 +575,13 @@ export default function ContributePage() {
                 htmlFor="steps"
                 className="block text-xs font-medium uppercase tracking-wider text-foreground"
               >
-                Cooking Steps (វិធីធ្វើ){" "}
+                {t("form.stepsLabel")}{" "}
                 <span className="text-destructive">*</span>
               </label>
               <Textarea
                 id="steps"
                 rows={6}
-                placeholder="Describe preparation and cooking step by step, e.g.:
-1. Heat a skillet over medium heat and stir-fry minced meat with prahok until cooked.
-2. Transfer cooked meat to a bowl and add lime juice and fish sauce."
+                placeholder={t("form.stepsPlaceholder")}
                 value={steps}
                 onChange={(e) => {
                   setSteps(e.target.value);
@@ -531,8 +594,37 @@ export default function ContributePage() {
                 <p className="mt-1 text-xs text-destructive">{errors.steps}</p>
               ) : (
                 <p className="mt-1 text-[11px] text-muted-foreground">
-                  Describe how to prepare and cook the dish (20–3000
-                  characters).
+                  {t("form.stepsHint")}
+                </p>
+              )}
+            </div>
+
+            {/* Cooking steps in English (optional translation) */}
+            <div>
+              <label
+                htmlFor="steps_en"
+                className="block text-xs font-medium uppercase tracking-wider text-foreground"
+              >
+                {t("form.stepsEnLabel")}
+              </label>
+              <Textarea
+                id="steps_en"
+                rows={6}
+                value={stepsEn}
+                onChange={(e) => {
+                  setStepsEn(e.target.value);
+                  if (errors.steps_en)
+                    setErrors((prev) => ({ ...prev, steps_en: undefined }));
+                }}
+                className={`mt-2 ${errors.steps_en ? "border-destructive focus-visible:ring-destructive" : ""}`}
+              />
+              {errors.steps_en ? (
+                <p className="mt-1 text-xs text-destructive">
+                  {errors.steps_en}
+                </p>
+              ) : (
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  {t("form.stepsEnHint")}
                 </p>
               )}
             </div>
@@ -543,12 +635,12 @@ export default function ContributePage() {
                 htmlFor="source"
                 className="block text-xs font-medium uppercase tracking-wider text-foreground"
               >
-                Source / Contributor Name (ប្រភព ឬ ឈ្មោះអ្នករួមចំណែក)
+                {t("form.sourceLabel")}
               </label>
               <Input
                 id="source"
                 type="text"
-                placeholder="e.g. Grandma Sokha (Wat Kor) or Family tables across Battambang"
+                placeholder={t("form.sourcePlaceholder")}
                 value={source}
                 onChange={(e) => {
                   setSource(e.target.value);
@@ -561,9 +653,7 @@ export default function ContributePage() {
                 <p className="mt-1 text-xs text-destructive">{errors.source}</p>
               ) : (
                 <p className="mt-1 text-[11px] text-muted-foreground">
-                  Your name, family cook, or village provenance (who or where
-                  the recipe came from). Defaults to your account name if left
-                  empty.
+                  {t("form.sourceHint")}
                 </p>
               )}
             </div>
@@ -574,7 +664,8 @@ export default function ContributePage() {
                 htmlFor="photo"
                 className="block text-xs font-medium uppercase tracking-wider text-foreground"
               >
-                Dish Photo <span className="text-destructive">*</span>
+                {t("form.photoLabel")}{" "}
+                <span className="text-destructive">*</span>
               </label>
 
               <div
@@ -602,7 +693,7 @@ export default function ContributePage() {
                       className="h-44 w-full max-w-md rounded-sm object-cover shadow-sm"
                     />
                     <p className="mt-2 text-xs font-medium text-primary">
-                      Click to change photo ({photoFile?.name})
+                      {t("form.photoChange", { name: photoFile?.name ?? "" })}
                     </p>
                   </div>
                 ) : (
@@ -611,10 +702,10 @@ export default function ContributePage() {
                       <Upload className="h-6 w-6" />
                     </div>
                     <p className="mt-2 text-xs font-medium text-foreground">
-                      Click to select a photo of the dish
+                      {t("form.photoSelect")}
                     </p>
                     <p className="mt-1 text-[11px] text-muted-foreground">
-                      JPG, PNG, or WebP formats supported (max 5 MB)
+                      {t("form.photoFormats")}
                     </p>
                   </div>
                 )}
@@ -634,7 +725,7 @@ export default function ContributePage() {
                 disabled={isSubmitting}
                 className="text-xs uppercase tracking-[0.2em]"
               >
-                Clear Form
+                {t("contribute.clearForm")}
               </Button>
               <Button
                 type="submit"
@@ -644,12 +735,12 @@ export default function ContributePage() {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Uploading & Saving...
+                    {t("contribute.submitting")}
                   </>
                 ) : (
                   <>
                     <Plus className="mr-1.5 h-4 w-4" />
-                    Submit Recipe
+                    {t("contribute.submit")}
                   </>
                 )}
               </Button>

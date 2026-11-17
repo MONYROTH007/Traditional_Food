@@ -30,6 +30,8 @@ export type Recipe = {
   image: string;
   ingredients: string[];
   instructions: string[];
+  ingredientsEn?: string[];
+  instructionsEn?: string[];
   owner?: string | null;
   status?: "pending" | "published" | "returned" | string | null;
   contributor?: string | null;

@@ -25,6 +25,12 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  categoryLabel,
+  localizedBody,
+  localizedTitles,
+  useLanguage,
+} from "@/lib/i18n";
 import { createClient } from "@/utils/supabase/client";
 
 export function RecipeCard({
@@ -38,6 +44,10 @@ export function RecipeCard({
   const [user, setUser] = useState<unknown | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [authPromptOpen, setAuthPromptOpen] = useState(false);
+  const { t, lang } = useLanguage();
+
+  const { primary, secondary } = localizedTitles(recipe, lang);
+  const { ingredients, instructions } = localizedBody(recipe, lang);
 
   useEffect(() => {
     const supabase = createClient();
@@ -86,22 +96,24 @@ export function RecipeCard({
               variant="secondary"
               className="absolute top-3 right-3 bg-background/90 font-sans text-[10px] tracking-wider uppercase backdrop-blur-sm"
             >
-              {recipe.category}
+              {categoryLabel(t, recipe.category)}
             </Badge>
           )}
 
           {isLocked && (
             <div className="absolute top-3 left-3 flex items-center gap-1.5 rounded-full border border-border/80 bg-background/90 px-2.5 py-1 text-[10px] font-medium tracking-wider uppercase text-muted-foreground backdrop-blur-sm">
               <Lock className="h-3 w-3 text-accent" />
-              <span>Login to view</span>
+              <span>{t("card.loginToView")}</span>
             </div>
           )}
         </div>
 
         <div className="border-t border-border p-5">
-          <p className="font-display text-sm text-accent">{recipe.khmer}</p>
+          {secondary && (
+            <p className="font-display text-sm text-accent">{secondary}</p>
+          )}
           <h3 className="mt-1 font-display text-xl text-primary transition-colors group-hover:text-primary/90">
-            {recipe.name}
+            {primary}
           </h3>
           <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
             {recipe.note}
@@ -109,11 +121,11 @@ export function RecipeCard({
 
           <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-1 border-t border-border pt-3 text-xs uppercase tracking-[0.14em] text-muted-foreground">
             <div>
-              <dt className="inline">From </dt>
+              <dt className="inline">{t("common.from")} </dt>
               <dd className="inline text-foreground">{recipe.place}</dd>
             </div>
             <div>
-              <dt className="inline">Time </dt>
+              <dt className="inline">{t("common.time")} </dt>
               <dd className="inline text-foreground">{recipe.time}</dd>
             </div>
           </dl>
@@ -122,7 +134,7 @@ export function RecipeCard({
             <div className="mt-2.5 flex items-center gap-1.5 text-xs text-muted-foreground">
               <User className="h-3.5 w-3.5 text-accent shrink-0" />
               <span className="font-medium text-foreground">
-                Contributed by:
+                {t("common.contributedBy")}:
               </span>
               <span className="truncate italic text-foreground/90">
                 {recipe.contributor}
@@ -132,7 +144,7 @@ export function RecipeCard({
 
           <div className="mt-4 flex items-center justify-between border-t border-border/50 pt-2 text-xs font-medium text-primary">
             <span className="uppercase tracking-wider">
-              {isLocked ? "Login Required" : "View Recipe Details"}
+              {isLocked ? t("common.loginRequired") : t("card.viewDetails")}
             </span>
             {isLocked ? (
               <Lock className="h-3.5 w-3.5 text-accent" />
@@ -154,12 +166,12 @@ export function RecipeCard({
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/30 to-transparent" />
             <div className="absolute bottom-4 left-6 right-6">
-              <span className="font-display text-lg text-accent">
-                {recipe.khmer}
-              </span>
-              <h2 className="font-display text-3xl text-primary">
-                {recipe.name}
-              </h2>
+              {secondary && (
+                <span className="font-display text-lg text-accent">
+                  {secondary}
+                </span>
+              )}
+              <h2 className="font-display text-3xl text-primary">{primary}</h2>
             </div>
           </div>
 
@@ -186,12 +198,14 @@ export function RecipeCard({
                   <span>•</span>
                   <span className="flex items-center gap-1 text-foreground font-medium">
                     <User className="h-3.5 w-3.5 text-accent" />
-                    <span>Contributed by: {recipe.contributor}</span>
+                    <span>
+                      {t("common.contributedBy")}: {recipe.contributor}
+                    </span>
                   </span>
                 </>
               )}
               <Badge variant="secondary" className="ml-auto">
-                {recipe.category}
+                {categoryLabel(t, recipe.category)}
               </Badge>
             </div>
 
@@ -203,10 +217,10 @@ export function RecipeCard({
             {/* Ingredients */}
             <div className="space-y-3">
               <h4 className="border-b border-border pb-2 font-display text-xl text-primary">
-                Ingredients (គ្រឿងផ្សំ)
+                {t("common.ingredients")}
               </h4>
               <ul className="grid gap-2 text-xs leading-relaxed text-foreground sm:grid-cols-2">
-                {recipe.ingredients.map((ing, idx) => (
+                {ingredients.map((ing, idx) => (
                   <li
                     key={idx}
                     className="flex items-start gap-2 rounded-sm border border-border/60 bg-background/50 p-2"
@@ -221,10 +235,10 @@ export function RecipeCard({
             {/* Instructions */}
             <div className="space-y-3">
               <h4 className="border-b border-border pb-2 font-display text-xl text-primary">
-                Preparation & Cooking (វិធីធ្វើ)
+                {t("common.cooking")}
               </h4>
               <ol className="space-y-3 text-xs leading-relaxed text-foreground">
-                {recipe.instructions.map((step, idx) => (
+                {instructions.map((step, idx) => (
                   <li
                     key={idx}
                     className="flex gap-3 rounded-sm border border-border/60 bg-background/50 p-3"
@@ -254,7 +268,7 @@ export function RecipeCard({
                   className="text-xs uppercase tracking-wider"
                 >
                   <Pencil className="mr-1.5 h-3.5 w-3.5" />
-                  Edit Entry
+                  {t("card.editEntry")}
                 </Button>
                 <Button
                   variant="secondary"
@@ -265,7 +279,7 @@ export function RecipeCard({
                   }}
                   className="text-xs uppercase tracking-wider"
                 >
-                  View / Delete Page
+                  {t("card.viewDeletePage")}
                 </Button>
               </div>
             )}
@@ -282,15 +296,12 @@ export function RecipeCard({
 
           <DialogHeader>
             <DialogTitle className="text-center font-display text-2xl text-primary">
-              Login Required
+              {t("common.loginRequired")}
             </DialogTitle>
             <DialogDescription className="mt-2 text-center text-xs leading-relaxed text-muted-foreground">
-              Full ingredients list and traditional step-by-step cooking
-              instructions for{" "}
-              <strong className="text-foreground">
-                {recipe.name} ({recipe.khmer})
-              </strong>{" "}
-              on Page 2 and beyond are reserved for registered users.
+              {t("card.authPromptText", {
+                name: secondary ? `${primary} (${secondary})` : primary,
+              })}
             </DialogDescription>
           </DialogHeader>
 
@@ -298,10 +309,7 @@ export function RecipeCard({
             <p className="font-display text-sm text-accent">
               ម្ហូបខ្មែរបុរាណ · Battambang
             </p>
-            <p className="text-muted-foreground">
-              Please log in to your account or create a new account to unlock
-              all heritage recipes across all pages.
-            </p>
+            <p className="text-muted-foreground">{t("card.authPromptBox")}</p>
           </div>
 
           <div className="flex flex-col gap-3">
@@ -313,7 +321,7 @@ export function RecipeCard({
               className="inline-flex w-full items-center justify-center gap-2 rounded-sm bg-primary px-4 py-2.5 text-xs uppercase tracking-[0.2em] text-primary-foreground"
             >
               <LogIn className="h-4 w-4" />
-              <span>Log In</span>
+              <span>{t("common.login")}</span>
             </Button>
 
             <Button
@@ -325,7 +333,7 @@ export function RecipeCard({
               className="inline-flex w-full items-center justify-center gap-2 rounded-sm border-border text-xs uppercase tracking-[0.2em]"
             >
               <UserPlus className="h-4 w-4 text-muted-foreground" />
-              <span>Create Account</span>
+              <span>{t("card.createAccount")}</span>
             </Button>
           </div>
         </DialogContent>
