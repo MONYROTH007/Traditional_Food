@@ -23,6 +23,26 @@
   --font-display: "Moul", "Cormorant Garamond", serif;
   --font-sans:
     "Moul", "Cormorant Garamond", ui-sans-serif, system-ui, sans-serif;
+
+  /*
+   * Khmer glyphs in Moul stack subscript consonants and diacritics below the
+   * baseline, so they render noticeably taller than Latin at the same
+   * font-size. Tailwind's stock line-heights for the small text utilities are
+   * short enough that `truncate` / `overflow-hidden` containers clip the
+   * descenders. Raise the line-height floor for those sizes site-wide.
+   */
+  --text-xs--line-height: 1.7;
+  --text-sm--line-height: 1.75;
+  --text-base--line-height: 1.75;
+  /* Display sizes need the same treatment: at the small end they sit in
+     truncating containers, and at the large end tight leading makes stacked
+     Khmer lines collide. Ratios taper as the absolute size grows. */
+  --text-lg--line-height: 1.9;
+  --text-xl--line-height: 1.9;
+  --text-2xl--line-height: 1.6;
+  --text-3xl--line-height: 1.5;
+  --text-4xl--line-height: 1.45;
+  --text-5xl--line-height: 1.4;
   --shadow-warm:
     0 1px 0 0 var(--border), 0 12px 24px -18px oklch(0.32 0.09 45 / 0.5);
   --background-image-khmer-band: repeating-linear-gradient(

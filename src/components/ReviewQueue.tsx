@@ -15,7 +15,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { dateLocale, useLanguage } from "@/lib/i18n";
+import { formatDateTime, useLanguage } from "@/lib/i18n";
 import { createClient } from "@/utils/supabase/client";
 import { resolvePhotoUrl, type EntryRow } from "@/utils/entries";
 
@@ -125,16 +125,7 @@ export function ReviewQueue({ initialEntries }: ReviewQueueProps) {
             const isProcessing = loadingId === entry.id;
             const photoSrc = resolvePhotoUrl(entry.photo_url);
             const formattedDate = entry.created_at
-              ? new Date(entry.created_at).toLocaleDateString(
-                  dateLocale(lang),
-                  {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  },
-                )
+              ? formatDateTime(entry.created_at, lang)
               : t("review.recentlySubmitted");
 
             const ingredientsList = entry.ingredients

@@ -760,7 +760,66 @@ export function localizedBody(
   return { ingredients: recipe.ingredients, instructions: recipe.instructions };
 }
 
-/** Locale string for date formatting in the active language. */
-export function dateLocale(lang: Lang): string {
-  return lang === "km" ? "km-KH" : "en-US";
+const KM_MONTHS = [
+  "មករា",
+  "កុម្ភៈ",
+  "មីនា",
+  "មេសា",
+  "ឧសភា",
+  "មិថុនា",
+  "កក្កដា",
+  "សីហា",
+  "កញ្ញា",
+  "តុលា",
+  "វិច្ឆិកា",
+  "ធ្នូ",
+];
+
+const EN_MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+/**
+ * Formats an ISO timestamp as a short date in the active language.
+ *
+ * Deliberately does NOT use `toLocaleDateString`: Node often ships without
+ * full ICU data for `km-KH`, so the server renders "Oct 8, 2026" while the
+ * browser renders "8 តុលា 2026" — a hydration mismatch that makes React throw
+ * away and re-render the tree. Reading the date in UTC also keeps server and
+ * client in agreement when they sit in different time zones (Vercel runs in
+ * UTC; readers are in ICT). Both halves of the render are therefore identical
+ * by construction.
+ */
+export function formatDate(iso: string, lang: Lang): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const day = d.getUTCDate();
+  const month = d.getUTCMonth();
+  const year = d.getUTCFullYear();
+  return lang === "km"
+    ? `${day} ${KM_MONTHS[month]} ${year}`
+    : `${EN_MONTHS[month]} ${day}, ${year}`;
+}
+
+/**
+ * As `formatDate`, plus a 24-hour time. Used where reviewers need to tell
+ * same-day submissions apart in the queue.
+ */
+export function formatDateTime(iso: string, lang: Lang): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const hh = String(d.getUTCHours()).padStart(2, "0");
+  const mm = String(d.getUTCMinutes()).padStart(2, "0");
+  return `${formatDate(iso, lang)} · ${hh}:${mm}`;
 }

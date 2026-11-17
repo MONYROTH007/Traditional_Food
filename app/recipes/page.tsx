@@ -157,7 +157,7 @@ export default function RecipesPage() {
                   key={cat}
                   type="button"
                   onClick={() => handleCategoryChange(cat)}
-                  className={`rounded-full px-3 py-1 text-xs transition-colors ${
+                  className={`flex min-h-8 items-center rounded-full px-3.5 text-xs transition-colors ${
                     isActive
                       ? "bg-primary font-medium text-primary-foreground"
                       : "bg-secondary text-secondary-foreground hover:bg-secondary/80"

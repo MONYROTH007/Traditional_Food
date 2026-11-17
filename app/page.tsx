@@ -61,7 +61,7 @@ export default function HomePage() {
             <p className="font-display text-base text-accent">
               ម្ហូបខ្មែរបុរាណ
             </p>
-            <h1 className="mt-2 max-w-xl font-display text-3xl leading-tight text-primary-foreground sm:text-5xl">
+            <h1 className="mt-2 max-w-xl font-display text-3xl text-primary-foreground sm:text-5xl">
               {t("home.heroTitle")}
             </h1>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-primary-foreground/85">
@@ -84,7 +84,7 @@ export default function HomePage() {
           </h2>
           <Link
             href="/recipes"
-            className="text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-primary"
+            className="flex min-h-8 shrink-0 items-center text-xs uppercase tracking-[0.2em] text-muted-foreground hover:text-primary"
           >
             {t("home.allDishes")}
           </Link>

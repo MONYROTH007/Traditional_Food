@@ -91,20 +91,23 @@ export function SiteChrome({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <header className="border-b border-border bg-card">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+          {/* min-w-0 + truncate let the brand yield space instead of pushing
+              the header past the viewport — the Khmer title is wide in Moul.
+              No `leading-tight` here: 1.25 clips Moul's descenders. */}
           <Link
             href="/"
-            className="leading-tight shrink-0"
+            className="min-w-0 flex-1"
             onClick={() => setOpen(false)}
           >
-            <span className="block font-display text-xl tracking-wide text-primary sm:text-2xl">
+            <span className="block truncate font-display text-sm tracking-wide text-primary sm:text-lg lg:text-xl xl:text-2xl">
               {t("brand.title")}
             </span>
-            <span className="block text-[0.7rem] uppercase tracking-[0.3em] text-muted-foreground">
+            <span className="block truncate text-[0.7rem] tracking-[0.2em] text-muted-foreground uppercase sm:tracking-[0.3em]">
               {t("brand.subtitle")}
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-4 md:gap-5 lg:gap-7 sm:flex">
+          <nav className="hidden items-center gap-4 lg:flex lg:gap-6 xl:gap-7">
             {links.map((l) => (
               <Link
                 key={l.href}
@@ -162,13 +165,13 @@ export function SiteChrome({ children }: { children: ReactNode }) {
             <LanguageSwitcher className="shrink-0" />
           </nav>
 
-          <div className="flex items-center gap-2 sm:hidden">
+          <div className="flex shrink-0 items-center gap-2 pl-2 lg:hidden">
             <LanguageSwitcher />
             <button
               type="button"
               aria-label={t("nav.menu")}
               onClick={() => setOpen((v) => !v)}
-              className="rounded-sm border border-border px-3 py-2 text-xs uppercase tracking-[0.2em] text-muted-foreground"
+              className="min-h-9 shrink-0 rounded-sm border border-border px-3 py-2 text-xs uppercase tracking-[0.15em] text-muted-foreground"
             >
               {t("nav.menu")}
             </button>
@@ -176,7 +179,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
         </div>
 
         {open && (
-          <nav className="flex flex-col border-t border-border sm:hidden">
+          <nav className="flex flex-col border-t border-border lg:hidden">
             {links.map((l) => (
               <Link
                 key={l.href}

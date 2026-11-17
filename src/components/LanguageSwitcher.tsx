@@ -31,7 +31,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
             onClick={() => setLang(opt.value)}
             aria-label={opt.aria}
             aria-pressed={active}
-            className={`cursor-pointer rounded-sm px-2 py-1 text-xs whitespace-nowrap transition-colors ${
+            className={`flex min-h-8 cursor-pointer items-center rounded-sm px-2.5 text-xs whitespace-nowrap transition-colors ${
               active
                 ? "bg-primary font-semibold text-primary-foreground"
                 : "text-muted-foreground hover:text-primary"

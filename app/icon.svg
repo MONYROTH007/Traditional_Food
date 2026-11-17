@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Traditional Khmer Recipes">
+  <rect width="32" height="32" rx="6" fill="#6B2D1F" />
+  <!-- steam -->
+  <path d="M12 8c0-1.6 1.6-1.9 1.6-3.4M16 8c0-1.6 1.6-1.9 1.6-3.4M20 8c0-1.6 1.6-1.9 1.6-3.4"
+        fill="none" stroke="#E0A458" stroke-width="1.5" stroke-linecap="round" />
+  <!-- bowl -->
+  <path d="M5 14h22a11 11 0 0 1-11 11A11 11 0 0 1 5 14Z" fill="#F2E3C9" />
+  <path d="M5 14h22" stroke="#E0A458" stroke-width="2" stroke-linecap="round" />
+</svg>

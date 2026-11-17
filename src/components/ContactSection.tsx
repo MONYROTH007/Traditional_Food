@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { dateLocale, useLanguage } from "@/lib/i18n";
+import { formatDate, useLanguage } from "@/lib/i18n";
 import { createClient } from "@/utils/supabase/client";
 
 type Note = {
@@ -121,13 +121,7 @@ export function ContactSection() {
   // Formatted at render time (not fetch time) so dates re-localize when the
   // reader switches language.
   const formatNoteDate = (note: Note) =>
-    note.createdAt
-      ? new Date(note.createdAt).toLocaleDateString(dateLocale(lang), {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        })
-      : t("contact.justNow");
+    note.createdAt ? formatDate(note.createdAt, lang) : t("contact.justNow");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
