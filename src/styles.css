@@ -21,7 +21,7 @@
 
 @theme inline {
   --font-display: "Cormorant Garamond", "Moul", serif;
-  --font-sans: "Kantumruy Pro", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Noto Sans Khmer", ui-sans-serif, system-ui, sans-serif;
   --shadow-warm:
     0 1px 0 0 var(--border), 0 12px 24px -18px oklch(0.32 0.09 45 / 0.5);
   --background-image-khmer-band: repeating-linear-gradient(
