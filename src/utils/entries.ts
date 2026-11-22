@@ -20,6 +20,7 @@ export type EntryRow = {
   ingredients_en?: string | null;
   steps_en?: string | null;
   source: string | null;
+  source_en?: string | null;
   photo_url: string | null;
   created_at?: string;
   owner?: string | null;
@@ -36,7 +37,10 @@ export function isMissingEnColumnsError(
 ): boolean {
   if (!error) return false;
   const columnMissing = error.code === "PGRST204" || error.code === "42703";
-  return columnMissing && /ingredients_en|steps_en/.test(error.message || "");
+  return (
+    columnMissing &&
+    /ingredients_en|steps_en|source_en/.test(error.message || "")
+  );
 }
 
 const IMAGE_MAP: Record<string, string> = {
@@ -135,6 +139,7 @@ export function mapEntryToRecipe(entry: EntryRow): Recipe {
   // leaked into the Khmer UI. They are left null and produced in the active
   // language at render time by `recipeMeta()` in @/lib/i18n.
   const source = entry.source?.trim() || null;
+  const sourceEn = entry.source_en?.trim() || null;
 
   return {
     id: entry.id,
@@ -142,6 +147,7 @@ export function mapEntryToRecipe(entry: EntryRow): Recipe {
     khmer,
     category: inferCategory(khmer, name),
     place: source,
+    placeEn: sourceEn,
     time: null,
     servings: null,
     note: null,
@@ -153,6 +159,7 @@ export function mapEntryToRecipe(entry: EntryRow): Recipe {
     owner: entry.owner ?? null,
     status: entry.status ?? "pending",
     contributor: source,
+    contributorEn: sourceEn,
   };
 }
 

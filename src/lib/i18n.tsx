@@ -221,11 +221,16 @@ const en = {
   "form.stepsEnLabel": "Cooking Steps in English (optional)",
   "form.stepsEnHint":
     "English translation of the cooking steps, shown to readers using the site in English (max 3000 characters).",
-  "form.sourceLabel": "Source / Contributor Name",
+  "form.sourceLabel": "Source / Contributor Name in Khmer",
   "form.sourcePlaceholder":
     "e.g. Grandma Sokha (Wat Kor) or Family tables across Battambang",
   "form.sourceHint":
     "Your name, family cook, or village provenance (who or where the recipe came from). Defaults to your account name if left empty.",
+  "form.sourceEnLabel": "Source / Contributor Name in English (optional)",
+  "form.sourceEnPlaceholder": "e.g. Psar Nath morning market",
+  "form.sourceEnHint":
+    "English version of the credit, shown to readers using the site in English (max 150 characters).",
+  "form.errSourceEnLength": "English source must be 150 characters or less.",
   "form.photoLabel": "Dish Photo",
   "form.photoOptionalLabel": "Dish Photo (optional to update)",
   "form.photoSelect": "Click to select a photo of the dish",
@@ -537,10 +542,15 @@ const km = {
   "form.stepsEnLabel": "វិធីធ្វើជាភាសាអង់គ្លេស (ស្រេចចិត្ត)",
   "form.stepsEnHint":
     "ការបកប្រែវិធីធ្វើជាភាសាអង់គ្លេស សម្រាប់អ្នកអានជាភាសាអង់គ្លេស (អតិបរមា 3000 តួអក្សរ)។",
-  "form.sourceLabel": "ប្រភព ឬឈ្មោះអ្នករួមចំណែក",
+  "form.sourceLabel": "ប្រភព ឬឈ្មោះអ្នករួមចំណែកជាភាសាខ្មែរ",
   "form.sourcePlaceholder": "ឧ. យាយសុខា (វត្តគរ) ឬតុបាយគ្រួសារនៅបាត់ដំបង",
   "form.sourceHint":
     "ឈ្មោះរបស់អ្នក អ្នកចម្អិនក្នុងគ្រួសារ ឬប្រភពភូមិ (ប្រសិនបើទុកទទេ នឹងប្រើឈ្មោះគណនីរបស់អ្នក)។",
+  "form.sourceEnLabel": "ប្រភព ឬឈ្មោះអ្នករួមចំណែកជាភាសាអង់គ្លេស (ស្រេចចិត្ត)",
+  "form.sourceEnPlaceholder": "ឧ. Psar Nath morning market",
+  "form.sourceEnHint":
+    "ការបកប្រែប្រភពជាភាសាអង់គ្លេស សម្រាប់អ្នកអានជាភាសាអង់គ្លេស (អតិបរមា 150 តួអក្សរ)។",
+  "form.errSourceEnLength": "ប្រភពជាភាសាអង់គ្លេសត្រូវតិចជាង ឬស្មើ 150 តួអក្សរ។",
   "form.photoLabel": "រូបភាពម្ហូប",
   "form.photoOptionalLabel": "រូបភាពម្ហូប (ស្រេចចិត្តក្នុងការកែ)",
   "form.photoSelect": "ចុចដើម្បីជ្រើសរើសរូបភាពម្ហូប",
@@ -796,7 +806,9 @@ export function recipeMeta(
         | "name"
         | "khmer"
         | "place"
+        | "placeEn"
         | "contributor"
+        | "contributorEn"
         | "time"
         | "servings"
         | "note"
@@ -814,9 +826,17 @@ export function recipeMeta(
 } {
   const title = recipe ? localizedTitles(recipe, lang).primary : "";
 
+  // The source/provenance is stored twice: Khmer in `source`, English in
+  // `source_en`. Show the reader's language, falling back to whichever text
+  // exists so a missing translation never renders as a blank credit.
+  const pick = (km?: string | null, en?: string | null) =>
+    (lang === "en" ? en?.trim() || km?.trim() : km?.trim() || en?.trim()) || "";
+
   return {
-    place: recipe?.place?.trim() || t("recipe.unknownPlace"),
-    contributor: recipe?.contributor?.trim() || t("recipe.unknownContributor"),
+    place: pick(recipe?.place, recipe?.placeEn) || t("recipe.unknownPlace"),
+    contributor:
+      pick(recipe?.contributor, recipe?.contributorEn) ||
+      t("recipe.unknownContributor"),
     time: recipe?.time?.trim() || t("recipe.defaultTime"),
     servings: recipe?.servings?.trim() || t("recipe.defaultServings"),
     note: recipe?.note?.trim() || t("recipe.note", { title }),

@@ -41,6 +41,7 @@ type FieldErrors = {
   steps?: string | undefined;
   steps_en?: string | undefined;
   source?: string | undefined;
+  source_en?: string | undefined;
   photo?: string | undefined;
 };
 
@@ -68,6 +69,7 @@ export default function EditRecipePage({
   const [steps, setSteps] = useState("");
   const [stepsEn, setStepsEn] = useState("");
   const [source, setSource] = useState("");
+  const [sourceEn, setSourceEn] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
@@ -121,6 +123,7 @@ export default function EditRecipePage({
           setSteps(entry.steps || "");
           setStepsEn(entry.steps_en || "");
           setSource(entry.source || "");
+          setSourceEn(entry.source_en || "");
           setExistingOwner(entry.owner || null);
 
           const recipeObj = mapEntryToRecipe(entry);
@@ -247,6 +250,10 @@ export default function EditRecipePage({
       newErrors.source = t("form.errSourceLength");
     }
 
+    if (sourceEn.trim().length > 150) {
+      newErrors.source_en = t("form.errSourceEnLength");
+    }
+
     // 6. photo: optional on edit. If a new photo is selected, validate it.
     if (photoFile) {
       const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
@@ -329,6 +336,7 @@ export default function EditRecipePage({
       const stepsTrimmed = steps.trim();
       const stepsEnTrimmed = stepsEn.trim();
       const sourceTrimmed = source.trim();
+      const sourceEnTrimmed = sourceEn.trim();
 
       const updatePayload = {
         title: titleTrimmed,
@@ -346,6 +354,7 @@ export default function EditRecipePage({
           ...updatePayload,
           ingredients_en: ingredientsEnTrimmed || null,
           steps_en: stepsEnTrimmed || null,
+          source_en: sourceEnTrimmed || null,
         })
         .eq("id", resolvedParams.id)
         .select();
@@ -675,6 +684,36 @@ export default function EditRecipePage({
               ) : (
                 <p className="mt-1 text-[11px] text-muted-foreground">
                   {t("form.sourceHint")}
+                </p>
+              )}
+            </div>
+
+            {/* Source in English (optional translation) */}
+            <div>
+              <label
+                htmlFor="source_en"
+                className="block text-xs font-medium uppercase tracking-wider text-foreground"
+              >
+                {t("form.sourceEnLabel")}
+              </label>
+              <Input
+                id="source_en"
+                type="text"
+                value={sourceEn}
+                onChange={(e) => {
+                  setSourceEn(e.target.value);
+                  if (errors.source_en)
+                    setErrors((prev) => ({ ...prev, source_en: undefined }));
+                }}
+                className={`mt-2 ${errors.source_en ? "border-destructive focus-visible:ring-destructive" : ""}`}
+              />
+              {errors.source_en ? (
+                <p className="mt-1 text-xs text-destructive">
+                  {errors.source_en}
+                </p>
+              ) : (
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  {t("form.sourceEnHint")}
                 </p>
               )}
             </div>

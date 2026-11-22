@@ -34,6 +34,7 @@ type FieldErrors = {
   steps?: string | undefined;
   steps_en?: string | undefined;
   source?: string | undefined;
+  source_en?: string | undefined;
   photo?: string | undefined;
 };
 
@@ -53,6 +54,7 @@ export default function ContributePage() {
   const [steps, setSteps] = useState("");
   const [stepsEn, setStepsEn] = useState("");
   const [source, setSource] = useState("");
+  const [sourceEn, setSourceEn] = useState("");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
 
@@ -185,6 +187,10 @@ export default function ContributePage() {
       newErrors.source = t("form.errSourceLength");
     }
 
+    if (sourceEn.trim().length > 150) {
+      newErrors.source_en = t("form.errSourceEnLength");
+    }
+
     if (!photoFile) {
       newErrors.photo = t("form.errPhotoRequired");
     } else {
@@ -213,6 +219,7 @@ export default function ContributePage() {
     setSteps("");
     setStepsEn("");
     setSource("");
+    setSourceEn("");
     setPhotoFile(null);
     if (photoPreview) URL.revokeObjectURL(photoPreview);
     setPhotoPreview(null);
@@ -272,6 +279,7 @@ export default function ContributePage() {
       const stepsTrimmed = steps.trim();
       const stepsEnTrimmed = stepsEn.trim();
       const sourceTrimmed = source.trim();
+      const sourceEnTrimmed = sourceEn.trim();
       // Fall back to the account name, but never to a hard-coded English
       // label: storing one would freeze it into the data and show it to Khmer
       // readers. null lets the UI localize the fallback at render time.
@@ -300,6 +308,7 @@ export default function ContributePage() {
             ...baseRow,
             ingredients_en: ingredientsEnTrimmed || null,
             steps_en: stepsEnTrimmed || null,
+            source_en: sourceEnTrimmed || null,
           },
         ])
         .select()
@@ -657,6 +666,37 @@ export default function ContributePage() {
               ) : (
                 <p className="mt-1 text-[11px] text-muted-foreground">
                   {t("form.sourceHint")}
+                </p>
+              )}
+            </div>
+
+            {/* Source in English (optional translation) */}
+            <div>
+              <label
+                htmlFor="source_en"
+                className="block text-xs font-medium uppercase tracking-wider text-foreground"
+              >
+                {t("form.sourceEnLabel")}
+              </label>
+              <Input
+                id="source_en"
+                type="text"
+                placeholder={t("form.sourceEnPlaceholder")}
+                value={sourceEn}
+                onChange={(e) => {
+                  setSourceEn(e.target.value);
+                  if (errors.source_en)
+                    setErrors((prev) => ({ ...prev, source_en: undefined }));
+                }}
+                className={`mt-2 ${errors.source_en ? "border-destructive focus-visible:ring-destructive" : ""}`}
+              />
+              {errors.source_en ? (
+                <p className="mt-1 text-xs text-destructive">
+                  {errors.source_en}
+                </p>
+              ) : (
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  {t("form.sourceEnHint")}
                 </p>
               )}
             </div>

@@ -20,6 +20,9 @@ export type Recipe = {
    * Khmer UI.
    */
   place: string | null;
+  /** English rendering of `place`/`contributor` (the `source_en` column). */
+  placeEn?: string | null;
+  contributorEn?: string | null;
   time: string | null;
   servings?: string | null;
   note: string | null;
