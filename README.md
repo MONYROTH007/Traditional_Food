@@ -89,36 +89,6 @@ git log --format='%b' | grep 'Co-Authored-By' | sed 's/.*: //;s/ <.*//' | sort |
 
 16 commits are additionally marked `AI-assisted` in the subject line, carried over from the Sprint 1–3 convention.
 
-### What was kept as written
-
-Most scaffolding survived unedited: the shadcn/ui component wiring, form state and validation plumbing, the Supabase client setup in `src/utils/supabase/`, the `LanguageProvider` and dictionary structure in `src/lib/i18n.tsx`, and the Tailwind layout for the cards and forms. These were read before accepting, but needed no correction — they are conventional patterns with an obvious right answer.
-
-### What was rewritten, and why
-
-| Model    | What it produced                                                                   | What I changed, and why                                                                                                                                                                                                                                                   |
-| -------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Sonnet 5 | Review queue calling `supabase.from('entries').update({ status })` from the client | Replaced with the `review_entry` RPC plus a strict `data === true` check. A client-side status update bypasses the gate entirely — this was the single most serious thing AI got wrong all semester                                                                       |
-| Sonnet 5 | Treated "no network error" as a successful review                                  | Made success require `data === true`, so a dropped connection can't be misread as a publish                                                                                                                                                                               |
-| Sonnet 5 | Edit page wrapped the status reset in `if (!isReviewer)`                           | Set `status: 'pending'` unconditionally, so a returned entry can always satisfy the RLS `WITH CHECK (status = 'pending')` policy on resubmit                                                                                                                              |
-| Sonnet 5 | Duplicate `User` import (lucide-react vs `@supabase/supabase-js`)                  | Broke `next build`; aliased to `UserIcon`                                                                                                                                                                                                                                 |
-| Opus 5   | Dates via `toLocaleDateString('km-KH', …)`                                         | Caused React hydration error #418 on every page: Node has no Khmer locale data, so the server emitted `Oct 8, 2026` and the browser `8 តុលា 2026`, and React discarded the tree. Replaced with explicit month tables and UTC getters so both halves agree by construction |
-| Opus 5   | Generated a per-recipe description and `time: "30 min"` / `servings: "4 servings"` | Those were constants shown on all 10 dishes, and Kralan's card claimed 30 minutes while its own steps say 1–1.5 hours. Removed rather than guessed — an archive crediting named sources should not assert figures it was never told                                       |
-| Fable 5  | Applied Moul to the entire site when asked to                                      | Did as asked, but it is a single-weight display face with no Latin glyphs, so bold was synthesised and English fell back mid-sentence. Walked back to Moul for display + Khmer OS Siemreap for body                                                                       |
-| All      | English-only error strings, and English baked into `mapEntryToRecipe`              | Rewritten bilingual, and the derived display strings moved out of the data layer so they render in the reader's language                                                                                                                                                  |
-
-### How the work was checked
-
-Not by reading diffs alone — the two worst defects of the semester were invisible in review and only appeared when the app was actually run:
-
-- **Headless Chrome audit** (Playwright driving system Chrome) over all 7 routes × 3 viewports (375 / 768 / 1440 px), measuring real geometry rather than eyeballing screenshots. It found horizontal overflow, a 404 favicon, sub-32px tap targets, clipped Khmer descenders and the hydration error in one pass.
-- **Database forensics.** Querying the live project and classifying each column by script exposed that all 10 entries had English sitting in the Khmer columns — something no amount of code review would have shown.
-- **Migrations tested before being applied**, by intercepting the Supabase response in the browser and rendering the post-migration rows. This caught a stranded `•` separator before it reached production.
-- **Five console attack scenarios** against the live instance (stranger inserting `status='published'`, updating someone else's row, calling `review_entry`, inserting into `reviewers`, selecting pending rows) — all blocked by RLS. Recorded in [JOURNAL.md](./JOURNAL.md) Entry 7.
-- **`npx tsc --noEmit`, `npm run lint`, `npm run build`** before every commit, plus a production `next start` smoke test of all 7 routes.
-- **Dictionary parity enforced by the compiler** — `src/lib/i18n.tsx` uses `satisfies`, so a key missing from either language fails the build (currently 240/240).
-
-The full chronological record of prompts, what came back and what changed before accepting is in [JOURNAL.md](./JOURNAL.md), including the Sprint 3 Prompt Journal.
-
 ## 6. Sources and credits
 
 Each entry in the archive carries a "Source / Contributor Name" field, shown on its card, detail page, and in the review queue, so every dish stays attributed to where it came from rather than the app.
@@ -166,45 +136,6 @@ Create `.env.local` in the repo root. It is already covered by `.gitignore` (`.e
 No value is printed anywhere in this repo.
 
 **The anon key is public by design.** It is Supabase's _publishable_ client key, meant to ship to the browser — every page here is a client component that talks to Supabase directly, so it is in the served JavaScript by necessity. It is safe only because every table it can reach is behind the Row-Level Security policies in Section 3 and the `review_entry` gate in Section 4. Do **not** add the `service_role` key to this project: it bypasses RLS entirely, and prefixing anything with `NEXT_PUBLIC_` would publish it to every visitor.
-
-### Database setup
-
-The base tables (`entries`, `reviewers`) and the `review_entry` / `is_reviewer` functions were created in the Supabase dashboard. Later schema changes live in [`db/migrations/`](./db/migrations/) and are applied by hand — there is no migration runner.
-
-To apply them: Supabase dashboard → **SQL Editor** → paste the file → **Run**. Use the SQL Editor rather than a contributor login: it runs as `postgres` and bypasses RLS, so published entries keep their status instead of being knocked back to `pending`.
-
-Run them in order — each is idempotent and self-guarding, so re-running one is a no-op:
-
-| File                                   | What it does                                          |
-| -------------------------------------- | ----------------------------------------------------- |
-| `001_bilingual_entries.sql`            | Adds `ingredients_en`, `steps_en` + length checks     |
-| `002_move_english_into_en_columns.sql` | Moves the English bodies into those columns           |
-| `003_khmer_recipe_bodies.sql`          | Writes the Khmer ingredients and steps                |
-| `004_bilingual_source.sql`             | Adds `source_en` and moves the English credit into it |
-| `005_khmer_source_text.sql`            | Writes the Khmer source credits                       |
-
-> The Khmer in `003` and `005` is AI-written translation, not a transcription of what the credited cooks said — see Section 6.
-
-Verify afterwards:
-
-```sql
-select left(title, 24) as dish,
-       ingredients ~ '[ក-៿]' as body_is_khmer,
-       coalesce(btrim(ingredients_en), '') <> '' as has_english,
-       source ~ '[ក-៿]' as credit_is_khmer
-from public.entries order by created_at;
-```
-
-### Becoming a reviewer (to see `/review`)
-
-`/review` returns a 403 unless `is_reviewer()` is true for your session. Sign up through the app, then add your user id to the allowlist from the SQL Editor. The column is `user_id` (confirmed against the live schema):
-
-```sql
-insert into public.reviewers (user_id)
-select id from auth.users where email = 'you@example.com';
-```
-
-Without this, `/review` correctly shows "គ្មានសិទ្ធិចូលមើល (Access Denied)" — that is the gate working, not a bug.
 
 ### Deploying
 
