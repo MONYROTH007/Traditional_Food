@@ -182,18 +182,25 @@ export function RecipeCard({
                 <MapPin className="h-3.5 w-3.5 text-accent" />
                 {meta.place}
               </span>
-              <span>•</span>
-              <span className="flex items-center gap-1">
-                <Clock className="h-3.5 w-3.5 text-accent" />
-                {meta.time}
+              {/* Separator travels with its item so a wrap cannot orphan it. */}
+              <span className="flex items-center gap-4">
+                <span aria-hidden="true">•</span>
+                <span className="flex items-center gap-1">
+                  <Clock className="h-3.5 w-3.5 text-accent" />
+                  {meta.time}
+                </span>
               </span>
-              <span>•</span>
-              <span>{meta.servings}</span>
-              <span>•</span>
-              <span className="flex items-center gap-1 text-foreground font-medium">
-                <User className="h-3.5 w-3.5 text-accent" />
-                <span>
-                  {t("common.contributedBy")}: {meta.contributor}
+              <span className="flex items-center gap-4">
+                <span aria-hidden="true">•</span>
+                <span>{meta.servings}</span>
+              </span>
+              <span className="flex items-center gap-4">
+                <span aria-hidden="true">•</span>
+                <span className="flex items-center gap-1 text-foreground font-medium">
+                  <User className="h-3.5 w-3.5 text-accent" />
+                  <span>
+                    {t("common.contributedBy")}: {meta.contributor}
+                  </span>
                 </span>
               </span>
               <Badge variant="secondary" className="ml-auto">

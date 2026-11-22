@@ -263,18 +263,26 @@ export default function RecipeDetailPage({
                   <MapPin className="h-4 w-4 text-accent" />
                   {meta.place}
                 </span>
-                <span>•</span>
-                <span className="flex items-center gap-1.5">
-                  <Clock className="h-4 w-4 text-accent" />
-                  {meta.time}
+                {/* Each separator is grouped with the item it introduces, so a
+                    wrap can never strand a "•" at the end of a line. */}
+                <span className="flex items-center gap-4">
+                  <span aria-hidden="true">•</span>
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="h-4 w-4 text-accent" />
+                    {meta.time}
+                  </span>
                 </span>
-                <span>•</span>
-                <span>{meta.servings}</span>
-                <span>•</span>
-                <span className="flex items-center gap-1.5 text-foreground font-medium">
-                  <UserIcon className="h-4 w-4 text-accent" />
-                  <span>
-                    {t("common.contributedBy")}: {meta.contributor}
+                <span className="flex items-center gap-4">
+                  <span aria-hidden="true">•</span>
+                  <span>{meta.servings}</span>
+                </span>
+                <span className="flex items-center gap-4">
+                  <span aria-hidden="true">•</span>
+                  <span className="flex items-center gap-1.5 text-foreground font-medium">
+                    <UserIcon className="h-4 w-4 text-accent" />
+                    <span>
+                      {t("common.contributedBy")}: {meta.contributor}
+                    </span>
                   </span>
                 </span>
                 <Badge
