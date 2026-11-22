@@ -205,19 +205,19 @@ const en = {
   "form.titleEnPlaceholder": "e.g. Larb Khmer or Fish Amok",
   "form.titleEnHint":
     "Latin letters, numbers, and common punctuation only (max 100 chars).",
-  "form.ingredientsLabel": "Ingredients",
+  "form.ingredientsLabel": "Ingredients in Khmer",
   "form.ingredientsPlaceholder":
-    "List ingredients line by line, e.g.:\n400g lean beef or pork, finely minced\n2 tbsp toasted rice powder\n3 tbsp fresh lime juice",
+    "List ingredients in Khmer, one per line, e.g.:\nសាច់គោ ឬសាច់ជ្រូកចិញ្រាំ 400 ក្រាម\nម្សៅអង្ករលីង 2 ស្លាបព្រា\nទឹកក្រូចឆ្មា 3 ស្លាបព្រា",
   "form.ingredientsHint":
-    "Provide the list of ingredients (10–2000 characters).",
+    "Write the ingredients in Khmer — this is the version Khmer readers see (10–2000 characters).",
   "form.ingredientsEnLabel": "Ingredients in English (optional)",
   "form.ingredientsEnHint":
     "English translation of the ingredients, shown to readers using the site in English (max 2000 characters).",
-  "form.stepsLabel": "Cooking Steps",
+  "form.stepsLabel": "Cooking Steps in Khmer",
   "form.stepsPlaceholder":
-    "Describe preparation and cooking step by step, e.g.:\n1. Heat a skillet over medium heat and stir-fry minced meat with prahok until cooked.\n2. Transfer cooked meat to a bowl and add lime juice and fish sauce.",
+    "Describe the steps in Khmer, one per line, e.g.:\n1. ដាំខ្ទះឱ្យក្តៅ រួចឆាសាច់ជាមួយប្រហុករហូតឈ្អិន។\n2. ដួសសាច់ដាក់ចាន រួចដាក់ទឹកក្រូចឆ្មា និងទឹកត្រី។",
   "form.stepsHint":
-    "Describe how to prepare and cook the dish (20–3000 characters).",
+    "Write the steps in Khmer — this is the version Khmer readers see (20–3000 characters).",
   "form.stepsEnLabel": "Cooking Steps in English (optional)",
   "form.stepsEnHint":
     "English translation of the cooking steps, shown to readers using the site in English (max 3000 characters).",
@@ -521,17 +521,19 @@ const km = {
   "form.titleEnPlaceholder": "ឧ. Larb Khmer ឬ Fish Amok",
   "form.titleEnHint":
     "អក្សរឡាតាំង លេខ និងសញ្ញាធម្មតាប៉ុណ្ណោះ (អតិបរមា 100 តួអក្សរ)។",
-  "form.ingredientsLabel": "គ្រឿងផ្សំ",
+  "form.ingredientsLabel": "គ្រឿងផ្សំជាភាសាខ្មែរ",
   "form.ingredientsPlaceholder":
     "សរសេរគ្រឿងផ្សំមួយបន្ទាត់ម្តង ឧ.:\nសាច់គោ ឬសាច់ជ្រូកចិញ្រាំ 400 ក្រាម\nម្សៅអង្ករលីង 2 ស្លាបព្រា\nទឹកក្រូចឆ្មា 3 ស្លាបព្រា",
-  "form.ingredientsHint": "សរសេរបញ្ជីគ្រឿងផ្សំ (10–2000 តួអក្សរ)។",
+  "form.ingredientsHint":
+    "សរសេរគ្រឿងផ្សំជាភាសាខ្មែរ — នេះជាអត្ថបទដែលអ្នកអានជាភាសាខ្មែរនឹងឃើញ (10–2000 តួអក្សរ)។",
   "form.ingredientsEnLabel": "គ្រឿងផ្សំជាភាសាអង់គ្លេស (ស្រេចចិត្ត)",
   "form.ingredientsEnHint":
     "ការបកប្រែគ្រឿងផ្សំជាភាសាអង់គ្លេស សម្រាប់អ្នកអានជាភាសាអង់គ្លេស (អតិបរមា 2000 តួអក្សរ)។",
-  "form.stepsLabel": "វិធីធ្វើ",
+  "form.stepsLabel": "វិធីធ្វើជាភាសាខ្មែរ",
   "form.stepsPlaceholder":
     "ពណ៌នាវិធីធ្វើមួយជំហានម្តង ឧ.:\n1. ដាំខ្ទះឱ្យក្តៅ រួចឆាសាច់ជាមួយប្រហុករហូតឈ្អិន។\n2. ដួសសាច់ដាក់ចាន រួចដាក់ទឹកក្រូចឆ្មា និងទឹកត្រី។",
-  "form.stepsHint": "ពណ៌នារបៀបរៀបចំ និងចម្អិនម្ហូប (20–3000 តួអក្សរ)។",
+  "form.stepsHint":
+    "សរសេរវិធីធ្វើជាភាសាខ្មែរ — នេះជាអត្ថបទដែលអ្នកអានជាភាសាខ្មែរនឹងឃើញ (20–3000 តួអក្សរ)។",
   "form.stepsEnLabel": "វិធីធ្វើជាភាសាអង់គ្លេស (ស្រេចចិត្ត)",
   "form.stepsEnHint":
     "ការបកប្រែវិធីធ្វើជាភាសាអង់គ្លេស សម្រាប់អ្នកអានជាភាសាអង់គ្លេស (អតិបរមា 3000 តួអក្សរ)។",

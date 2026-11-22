@@ -26,7 +26,9 @@ The primary audience is Cambodians — in Battambang and beyond — who want to 
 - `entries` — one row per recipe: `id`, `title` (Khmer), `title_en`, `ingredients`, `steps`, `ingredients_en`, `steps_en`, `source` (provenance/contributor), `photo_url`, `owner` (→ `auth.users`), `status`, `created_at`.
 - `reviewers` — the allowlist of accounts permitted to approve or return submissions.
 
-`ingredients_en` and `steps_en` are nullable English translations added by [`001_bilingual_entries.sql`](./db/migrations/001_bilingual_entries.sql). The Khmer text in `ingredients` / `steps` stays required and authoritative; a null translation simply means the English reader sees the Khmer original. The app detects the columns being absent and saves without them, so it keeps working if that migration has not been run yet.
+`ingredients_en` and `steps_en` are nullable English translations added by [`001_bilingual_entries.sql`](./db/migrations/001_bilingual_entries.sql). By design the Khmer text in `ingredients` / `steps` is required and authoritative, and a null translation simply means the English reader sees the Khmer original. The app also tolerates those columns not existing yet, saving without them if `001` has not been run.
+
+> **Known data issue.** An audit of the 10 published entries found the body columns inverted against that intent: `ingredients` and `steps` hold _English_ text and the `_en` columns are empty, so Khmer readers currently see English recipe bodies. Titles are fine — every `title` is Khmer and every `title_en` is English. The cause was the contribute form, which labelled the title "Dish Name in Khmer" but the bodies only "Ingredients" / "Cooking Steps", so contributors filled them in English; those labels now state the language. [`002_move_english_into_en_columns.sql`](./db/migrations/002_move_english_into_en_columns.sql) stages the stored rows by copying the English into the `_en` columns. Writing the Khmer bodies is content work and remains outstanding.
 
 **Three entry statuses**, surfaced everywhere with bilingual badges:
 
