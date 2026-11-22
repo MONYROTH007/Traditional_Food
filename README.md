@@ -28,7 +28,21 @@ The primary audience is Cambodians — in Battambang and beyond — who want to 
 
 `ingredients_en` and `steps_en` are nullable English translations added by [`001_bilingual_entries.sql`](./db/migrations/001_bilingual_entries.sql). By design the Khmer text in `ingredients` / `steps` is required and authoritative, and a null translation simply means the English reader sees the Khmer original. The app also tolerates those columns not existing yet, saving without them if `001` has not been run.
 
-> **Known data issue.** An audit of the 10 published entries found the body columns inverted against that intent: `ingredients` and `steps` hold _English_ text and the `_en` columns are empty, so Khmer readers currently see English recipe bodies. Titles are fine — every `title` is Khmer and every `title_en` is English. The cause was the contribute form, which labelled the title "Dish Name in Khmer" but the bodies only "Ingredients" / "Cooking Steps", so contributors filled them in English; those labels now state the language. [`002_move_english_into_en_columns.sql`](./db/migrations/002_move_english_into_en_columns.sql) stages the stored rows by copying the English into the `_en` columns. [`003_khmer_recipe_bodies.sql`](./db/migrations/003_khmer_recipe_bodies.sql) then fills the base columns with Khmer. **Those Khmer texts are AI-written translations of the stored English, not transcriptions of what the credited cooks said** — have a Khmer speaker review them before publishing, since every entry is attributed to a named source. [`004_bilingual_source.sql`](./db/migrations/004_bilingual_source.sql) and [`005_khmer_source_text.sql`](./db/migrations/005_khmer_source_text.sql) do the same for the `source` credit, so a Khmer reader sees a Khmer credit and an English reader the original English; where a translation is missing the app falls back to whichever text exists rather than showing a blank credit.
+> **How the bilingual columns came to be.** The body and credit columns were
+> originally filled in English — `ingredients`, `steps` and `source` held
+> English text while the `_en` columns did not exist. The cause was the
+> contribute form: it labelled the title "Dish Name in Khmer" (so every title
+> is correctly Khmer) but labelled the bodies only "Ingredients" / "Cooking
+> Steps", so contributors filled them in English. Those labels now state the
+> language, and migrations `002`–`005` moved the English into the `_en`
+> columns and wrote Khmer into the base columns. All 10 published entries are
+> now bilingual in both body and credit.
+>
+> **The Khmer in `003` and `005` is AI-written translation, not a
+> transcription of what the credited cooks and markets said.** Since every
+> entry is attributed to a named source, it is worth having a Khmer speaker
+> read those two files — particularly the village and market names in `005`.
+> The English is preserved in the `_en` columns either way.
 
 **Three entry statuses**, surfaced everywhere with bilingual badges:
 

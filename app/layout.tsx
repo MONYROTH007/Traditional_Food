@@ -34,7 +34,7 @@ export default function RootLayout({
         />
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Moul&family=Noto+Sans+Khmer:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Moul&family=Siemreap&family=Noto+Sans+Khmer:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600&display=swap"
         />
       </head>
       <body>

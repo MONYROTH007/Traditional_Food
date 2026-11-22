@@ -27,12 +27,15 @@
    * heavily ornamented. It carries the heritage character beautifully in
    * headings, but as body copy it is hard to read, fakes its bolds, and
    * drops every English word to a fallback family. So it is scoped to
-   * display, and body text uses Noto Sans Khmer — a text face built for
-   * running copy, with real weights 400-700 and matching Latin glyphs, so
-   * Khmer and English share one voice.
+   * display, and body text uses Khmer OS Siemreap (served by Google Fonts as
+   * "Siemreap"), a text face built for running copy that covers Khmer and
+   * Latin so the two share one voice. It ships a single weight, so bold is
+   * synthesized by the browser; Noto Sans Khmer follows it in the stack to
+   * cover anything Siemreap lacks.
    */
   --font-display: "Moul", "Cormorant Garamond", serif;
-  --font-sans: "Noto Sans Khmer", ui-sans-serif, system-ui, sans-serif;
+  --font-sans:
+    "Siemreap", "Noto Sans Khmer", ui-sans-serif, system-ui, sans-serif;
 
   /*
    * Khmer stacks subscript consonants and diacritics below the baseline, so
@@ -187,6 +190,34 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
   }
+}
+
+/*
+ * Khmer typography corrections.
+ *
+ * Khmer is a complex script: a consonant carries subscripts beneath it and
+ * vowel signs around it, and the whole cluster reads as one unit. This design
+ * uses wide editorial tracking (up to 0.3em) on its uppercase Latin labels,
+ * which is right for Latin but pulls Khmer clusters apart and makes them
+ * noticeably harder to read.
+ *
+ * These rules sit outside @layer on purpose: unlayered CSS beats Tailwind's
+ * layered utilities, so they override every `tracking-*` class without having
+ * to strip the class from 100+ elements and lose the Latin design. They only
+ * apply while the interface is being read in Khmer — `lang` is set on <html>
+ * by the language provider — so the English design is untouched.
+ */
+html:lang(km) [class*="tracking-"] {
+  letter-spacing: normal;
+}
+
+/*
+ * Khmer puts spaces between phrases rather than between words, so those few
+ * breaks carry more weight than in Latin. A little extra room makes the
+ * phrase boundaries read clearly without touching the clusters themselves.
+ */
+html:lang(km) body {
+  word-spacing: 0.1em;
 }
 
 /* Hide Lovable badge / icon elements */
