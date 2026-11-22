@@ -14,18 +14,17 @@ export type Recipe = {
   khmer: string;
   category: RecipeCategory;
   /*
-   * Display strings that are derived, not stored. They are null on entries
-   * mapped from the database and are rendered in the active language by
-   * `recipeMeta()` in @/lib/i18n — baking English in here leaked it into the
-   * Khmer UI.
+   * Provenance, straight from the `source` / `source_en` columns. Rendered in
+   * the reader's language by `recipeMeta()` in @/lib/i18n.
+   *
+   * There is deliberately no `time`, `servings` or `note` here. Those were
+   * hardcoded constants ("30 min", "Serves 4", a one-line template) shown
+   * identically on every dish, which made the archive assert things it did
+   * not know — Kralan's card claimed 30 minutes while its own steps say it
+   * roasts for 1 to 1.5 hours.
    */
-  place: string | null;
-  /** English rendering of `place`/`contributor` (the `source_en` column). */
-  placeEn?: string | null;
-  contributorEn?: string | null;
-  time: string | null;
-  servings?: string | null;
-  note: string | null;
+  source: string | null;
+  sourceEn?: string | null;
   image: string;
   ingredients: string[];
   instructions: string[];
@@ -33,5 +32,4 @@ export type Recipe = {
   instructionsEn?: string[];
   owner?: string | null;
   status?: "pending" | "published" | "returned" | string | null;
-  contributor?: string | null;
 };

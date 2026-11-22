@@ -308,21 +308,19 @@ export default function MyEntriesPage() {
                             {titles.primary}
                           </h3>
 
-                          <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
-                            {meta.note}
-                          </p>
+                          {recipe.ingredients.length > 0 && (
+                            <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+                              {recipe.ingredients.slice(0, 3).join(" · ")}
+                              {recipe.ingredients.length > 3 ? " …" : ""}
+                            </p>
+                          )}
 
-                          <div className="mt-4 border-t border-border/60 pt-3 text-[11px] uppercase tracking-wider text-muted-foreground flex flex-wrap items-center justify-between gap-2">
-                            <div>
-                              <span>{t("common.from")}: </span>
-                              <span className="text-foreground">
-                                {meta.place}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-1 text-foreground/80">
-                              <UserIcon className="h-3 w-3 text-accent" />
-                              <span>{meta.contributor}</span>
-                            </div>
+                          <div className="mt-4 flex items-center gap-1.5 border-t border-border/60 pt-3 text-[11px] text-muted-foreground">
+                            <UserIcon className="h-3 w-3 shrink-0 text-accent" />
+                            <span className="shrink-0">{t("common.from")}</span>
+                            <span className="truncate text-foreground">
+                              {meta.source}
+                            </span>
                           </div>
 
                           {/* Actionable notice for returned recipes */}

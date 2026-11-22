@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
-  Clock,
   MapPin,
   CheckCircle2,
   Utensils,
@@ -13,7 +12,6 @@ import {
   Trash2,
   Loader2,
   AlertCircle,
-  User as UserIcon,
 } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 
@@ -259,30 +257,13 @@ export default function RecipeDetailPage({
             <div className="p-6 sm:p-8 space-y-8">
               {/* Meta information */}
               <div className="flex flex-wrap items-center gap-4 border-b border-border pb-4 text-xs uppercase tracking-wider text-muted-foreground">
+                {/* Provenance, once. This row used to repeat `source` as both
+                    "From" and "Contributed by", and carried a hardcoded
+                    "30 min / Serves 4" that was identical on every dish. */}
                 <span className="flex items-center gap-1.5 text-foreground font-medium">
                   <MapPin className="h-4 w-4 text-accent" />
-                  {meta.place}
-                </span>
-                {/* Each separator is grouped with the item it introduces, so a
-                    wrap can never strand a "•" at the end of a line. */}
-                <span className="flex items-center gap-4">
-                  <span aria-hidden="true">•</span>
-                  <span className="flex items-center gap-1.5">
-                    <Clock className="h-4 w-4 text-accent" />
-                    {meta.time}
-                  </span>
-                </span>
-                <span className="flex items-center gap-4">
-                  <span aria-hidden="true">•</span>
-                  <span>{meta.servings}</span>
-                </span>
-                <span className="flex items-center gap-4">
-                  <span aria-hidden="true">•</span>
-                  <span className="flex items-center gap-1.5 text-foreground font-medium">
-                    <UserIcon className="h-4 w-4 text-accent" />
-                    <span>
-                      {t("common.contributedBy")}: {meta.contributor}
-                    </span>
+                  <span>
+                    {t("common.from")} {meta.source}
                   </span>
                 </span>
                 <Badge
@@ -292,11 +273,6 @@ export default function RecipeDetailPage({
                   {categoryLabel(t, recipe.category)}
                 </Badge>
               </div>
-
-              {/* Note / Intro */}
-              <p className="text-base leading-relaxed italic text-muted-foreground border-l-2 border-accent pl-4">
-                &ldquo;{meta.note}&rdquo;
-              </p>
 
               {/* Ingredients */}
               <div className="space-y-4">

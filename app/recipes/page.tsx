@@ -67,7 +67,8 @@ export default function RecipesPage() {
         !q ||
         r.name.toLowerCase().includes(q) ||
         r.khmer.toLowerCase().includes(q) ||
-        (r.place ?? "").toLowerCase().includes(q) ||
+        (r.source ?? "").toLowerCase().includes(q) ||
+        (r.sourceEn ?? "").toLowerCase().includes(q) ||
         r.category.toLowerCase().includes(q) ||
         r.ingredients.some((ing) => ing.toLowerCase().includes(q)) ||
         (r.ingredientsEn ?? []).some((ing) => ing.toLowerCase().includes(q));

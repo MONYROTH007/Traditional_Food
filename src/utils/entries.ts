@@ -134,10 +134,8 @@ export function mapEntryToRecipe(entry: EntryRow): Recipe {
   const name = entry.title_en || entry.title;
   const khmer = entry.title;
 
-  // `place`, `contributor`, `note`, `time` and `servings` are display strings,
-  // not stored data. Baking them in here froze them into English, so they
-  // leaked into the Khmer UI. They are left null and produced in the active
-  // language at render time by `recipeMeta()` in @/lib/i18n.
+  // Provenance is stored in both languages; `recipeMeta()` picks one at
+  // render time rather than freezing a language in here.
   const source = entry.source?.trim() || null;
   const sourceEn = entry.source_en?.trim() || null;
 
@@ -146,11 +144,8 @@ export function mapEntryToRecipe(entry: EntryRow): Recipe {
     name,
     khmer,
     category: inferCategory(khmer, name),
-    place: source,
-    placeEn: sourceEn,
-    time: null,
-    servings: null,
-    note: null,
+    source,
+    sourceEn,
     image: resolvePhotoUrl(entry.photo_url),
     ingredients: ingredientsList,
     instructions: instructionsList,
@@ -158,8 +153,6 @@ export function mapEntryToRecipe(entry: EntryRow): Recipe {
     instructionsEn: instructionsEnList,
     owner: entry.owner ?? null,
     status: entry.status ?? "pending",
-    contributor: source,
-    contributorEn: sourceEn,
   };
 }
 

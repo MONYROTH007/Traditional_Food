@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Lock,
-  Clock,
   MapPin,
   CheckCircle2,
   LogIn,
@@ -12,7 +11,6 @@ import {
   BookOpen,
   Pencil,
   Trash2,
-  User,
 } from "lucide-react";
 
 import type { Recipe } from "@/data/recipes";
@@ -117,29 +115,21 @@ export function RecipeCard({
           <h3 className="mt-1 font-display text-xl text-primary transition-colors group-hover:text-primary/90">
             {primary}
           </h3>
-          <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-            {meta.note}
-          </p>
+          {/* A real preview of the dish rather than a generated sentence: the
+              first few ingredients, in the reader's language. */}
+          {ingredients.length > 0 && (
+            <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+              {ingredients.slice(0, 3).join(" · ")}
+              {ingredients.length > 3 ? " …" : ""}
+            </p>
+          )}
 
-          <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-1 border-t border-border pt-3 text-xs uppercase tracking-[0.14em] text-muted-foreground">
-            <div>
-              <dt className="inline">{t("common.from")} </dt>
-              <dd className="inline text-foreground">{meta.place}</dd>
-            </div>
-            <div>
-              <dt className="inline">{t("common.time")} </dt>
-              <dd className="inline text-foreground">{meta.time}</dd>
-            </div>
-          </dl>
-
-          <div className="mt-2.5 flex items-center gap-1.5 text-xs text-muted-foreground">
-            <User className="h-3.5 w-3.5 text-accent shrink-0" />
-            <span className="font-medium text-foreground">
-              {t("common.contributedBy")}:
-            </span>
-            <span className="truncate italic text-foreground/90">
-              {meta.contributor}
-            </span>
+          {/* Provenance, shown once. It used to print twice — as "From" and
+              again as "Contributed by" — from the same `source` column. */}
+          <div className="mt-4 flex items-center gap-1.5 border-t border-border pt-3 text-xs text-muted-foreground">
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-accent" />
+            <span className="shrink-0">{t("common.from")}</span>
+            <span className="truncate text-foreground">{meta.source}</span>
           </div>
 
           <div className="mt-4 flex items-center justify-between border-t border-border/50 pt-2 text-xs font-medium text-primary">
@@ -178,40 +168,16 @@ export function RecipeCard({
           <div className="space-y-6 p-6">
             {/* Meta details */}
             <div className="flex flex-wrap items-center gap-4 border-b border-border pb-4 text-xs uppercase tracking-wider text-muted-foreground">
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-1.5 font-medium text-foreground">
                 <MapPin className="h-3.5 w-3.5 text-accent" />
-                {meta.place}
-              </span>
-              {/* Separator travels with its item so a wrap cannot orphan it. */}
-              <span className="flex items-center gap-4">
-                <span aria-hidden="true">•</span>
-                <span className="flex items-center gap-1">
-                  <Clock className="h-3.5 w-3.5 text-accent" />
-                  {meta.time}
-                </span>
-              </span>
-              <span className="flex items-center gap-4">
-                <span aria-hidden="true">•</span>
-                <span>{meta.servings}</span>
-              </span>
-              <span className="flex items-center gap-4">
-                <span aria-hidden="true">•</span>
-                <span className="flex items-center gap-1 text-foreground font-medium">
-                  <User className="h-3.5 w-3.5 text-accent" />
-                  <span>
-                    {t("common.contributedBy")}: {meta.contributor}
-                  </span>
+                <span>
+                  {t("common.from")} {meta.source}
                 </span>
               </span>
               <Badge variant="secondary" className="ml-auto">
                 {categoryLabel(t, recipe.category)}
               </Badge>
             </div>
-
-            {/* Note / Description */}
-            <p className="text-sm leading-relaxed italic text-muted-foreground">
-              &ldquo;{meta.note}&rdquo;
-            </p>
 
             {/* Ingredients */}
             <div className="space-y-3">
