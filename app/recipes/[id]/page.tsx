@@ -25,6 +25,7 @@ import {
   categoryLabel,
   localizedBody,
   localizedTitles,
+  recipeMeta,
   useLanguage,
 } from "@/lib/i18n";
 import { createClient } from "@/utils/supabase/client";
@@ -134,6 +135,8 @@ export default function RecipeDetailPage({
   const isOwner = Boolean(
     user && recipe && recipe.owner && user.id === recipe.owner,
   );
+
+  const meta = recipeMeta(recipe, t, lang);
 
   return (
     <SiteChrome>
@@ -258,30 +261,22 @@ export default function RecipeDetailPage({
               <div className="flex flex-wrap items-center gap-4 border-b border-border pb-4 text-xs uppercase tracking-wider text-muted-foreground">
                 <span className="flex items-center gap-1.5 text-foreground font-medium">
                   <MapPin className="h-4 w-4 text-accent" />
-                  {recipe.place}
+                  {meta.place}
                 </span>
                 <span>•</span>
                 <span className="flex items-center gap-1.5">
                   <Clock className="h-4 w-4 text-accent" />
-                  {recipe.time}
+                  {meta.time}
                 </span>
-                {recipe.servings && (
-                  <>
-                    <span>•</span>
-                    <span>{recipe.servings}</span>
-                  </>
-                )}
-                {recipe.contributor && (
-                  <>
-                    <span>•</span>
-                    <span className="flex items-center gap-1.5 text-foreground font-medium">
-                      <UserIcon className="h-4 w-4 text-accent" />
-                      <span>
-                        {t("common.contributedBy")}: {recipe.contributor}
-                      </span>
-                    </span>
-                  </>
-                )}
+                <span>•</span>
+                <span>{meta.servings}</span>
+                <span>•</span>
+                <span className="flex items-center gap-1.5 text-foreground font-medium">
+                  <UserIcon className="h-4 w-4 text-accent" />
+                  <span>
+                    {t("common.contributedBy")}: {meta.contributor}
+                  </span>
+                </span>
                 <Badge
                   variant="secondary"
                   className="ml-auto text-xs uppercase tracking-wider"
@@ -292,7 +287,7 @@ export default function RecipeDetailPage({
 
               {/* Note / Intro */}
               <p className="text-base leading-relaxed italic text-muted-foreground border-l-2 border-accent pl-4">
-                &ldquo;{recipe.note}&rdquo;
+                &ldquo;{meta.note}&rdquo;
               </p>
 
               {/* Ingredients */}

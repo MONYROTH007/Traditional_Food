@@ -20,25 +20,32 @@
  */
 
 @theme inline {
+  /*
+   * Type pairing.
+   *
+   * Moul is a Khmer *display* face: one weight only, no Latin glyphs, and
+   * heavily ornamented. It carries the heritage character beautifully in
+   * headings, but as body copy it is hard to read, fakes its bolds, and
+   * drops every English word to a fallback family. So it is scoped to
+   * display, and body text uses Noto Sans Khmer — a text face built for
+   * running copy, with real weights 400-700 and matching Latin glyphs, so
+   * Khmer and English share one voice.
+   */
   --font-display: "Moul", "Cormorant Garamond", serif;
-  --font-sans:
-    "Moul", "Cormorant Garamond", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Noto Sans Khmer", ui-sans-serif, system-ui, sans-serif;
 
   /*
-   * Khmer glyphs in Moul stack subscript consonants and diacritics below the
-   * baseline, so they render noticeably taller than Latin at the same
-   * font-size. Tailwind's stock line-heights for the small text utilities are
-   * short enough that `truncate` / `overflow-hidden` containers clip the
-   * descenders. Raise the line-height floor for those sizes site-wide.
+   * Khmer stacks subscript consonants and diacritics below the baseline, so
+   * it needs more leading than Latin at the same size — Tailwind's stock
+   * values clip the descenders inside `truncate` / `overflow-hidden`
+   * containers. These are tuned for Noto Sans Khmer in body copy and Moul in
+   * headings, tapering as the absolute size grows.
    */
-  --text-xs--line-height: 1.7;
-  --text-sm--line-height: 1.75;
-  --text-base--line-height: 1.75;
-  /* Display sizes need the same treatment: at the small end they sit in
-     truncating containers, and at the large end tight leading makes stacked
-     Khmer lines collide. Ratios taper as the absolute size grows. */
-  --text-lg--line-height: 1.9;
-  --text-xl--line-height: 1.9;
+  --text-xs--line-height: 1.6;
+  --text-sm--line-height: 1.65;
+  --text-base--line-height: 1.65;
+  --text-lg--line-height: 1.75;
+  --text-xl--line-height: 1.8;
   --text-2xl--line-height: 1.6;
   --text-3xl--line-height: 1.5;
   --text-4xl--line-height: 1.45;

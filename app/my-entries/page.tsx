@@ -24,6 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   categoryLabel,
   localizedTitles,
+  recipeMeta,
   useLanguage,
   type MsgKey,
 } from "@/lib/i18n";
@@ -267,6 +268,7 @@ export default function MyEntriesPage() {
                     `status.${normalizeStatus(recipe.rawStatus)}`,
                   );
                   const titles = localizedTitles(recipe, lang);
+                  const meta = recipeMeta(recipe, t, lang);
 
                   return (
                     <article
@@ -307,22 +309,20 @@ export default function MyEntriesPage() {
                           </h3>
 
                           <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
-                            {recipe.note}
+                            {meta.note}
                           </p>
 
                           <div className="mt-4 border-t border-border/60 pt-3 text-[11px] uppercase tracking-wider text-muted-foreground flex flex-wrap items-center justify-between gap-2">
                             <div>
                               <span>{t("common.from")}: </span>
                               <span className="text-foreground">
-                                {recipe.place}
+                                {meta.place}
                               </span>
                             </div>
-                            {recipe.contributor && (
-                              <div className="flex items-center gap-1 text-foreground/80">
-                                <UserIcon className="h-3 w-3 text-accent" />
-                                <span>{recipe.contributor}</span>
-                              </div>
-                            )}
+                            <div className="flex items-center gap-1 text-foreground/80">
+                              <UserIcon className="h-3 w-3 text-accent" />
+                              <span>{meta.contributor}</span>
+                            </div>
                           </div>
 
                           {/* Actionable notice for returned recipes */}

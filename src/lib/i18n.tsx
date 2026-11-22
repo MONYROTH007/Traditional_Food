@@ -54,6 +54,15 @@ const en = {
   "common.cooking": "Preparation & Cooking",
   "common.categoryAll": "All",
 
+  // Recipe metadata that is generated rather than stored, so it must be
+  // produced in the active language instead of baked in at mapping time.
+  "recipe.note": "{title} — a traditional dish of Battambang province.",
+  "recipe.defaultTime": "30 min",
+  "recipe.defaultServings": "Serves 4",
+  "recipe.unknownPlace": "Battambang province",
+  "recipe.unknownContributor": "Battambang heritage kitchen",
+  "recipe.communityContributor": "Community contributor",
+
   // Categories (display labels; stored values stay in English)
   "cat.Soups & Stews": "Soups & Stews",
   "cat.Main Dishes": "Main Dishes",
@@ -365,6 +374,14 @@ const km = {
   "common.ingredients": "គ្រឿងផ្សំ",
   "common.cooking": "វិធីធ្វើ",
   "common.categoryAll": "ទាំងអស់",
+
+  // Recipe metadata that is generated rather than stored.
+  "recipe.note": "{title} — ម្ហូបបុរាណនៃខេត្តបាត់ដំបង។",
+  "recipe.defaultTime": "៣០ នាទី",
+  "recipe.defaultServings": "សម្រាប់ ៤ នាក់",
+  "recipe.unknownPlace": "ខេត្តបាត់ដំបង",
+  "recipe.unknownContributor": "ផ្ទះបាយបេតិកភណ្ឌបាត់ដំបង",
+  "recipe.communityContributor": "អ្នករួមចំណែកក្នុងសហគមន៍",
 
   // Categories
   "cat.Soups & Stews": "សម្ល និងស៊ុប",
@@ -758,6 +775,50 @@ export function localizedBody(
     };
   }
   return { ingredients: recipe.ingredients, instructions: recipe.instructions };
+}
+
+/**
+ * Display metadata for a recipe, produced in the active language.
+ *
+ * `place`, `contributor`, `time`, `servings` and `note` are derived strings
+ * rather than stored columns. They used to be generated in English inside
+ * `mapEntryToRecipe`, which meant English sentences and "30 min" appeared on
+ * every card even with the UI set to Khmer. Generating them here keeps them
+ * in step with the switcher. A contributor's own `source` text is theirs and
+ * is shown verbatim — only the fallbacks are translated.
+ */
+export function recipeMeta(
+  recipe:
+    | Pick<
+        Recipe,
+        | "name"
+        | "khmer"
+        | "place"
+        | "contributor"
+        | "time"
+        | "servings"
+        | "note"
+      >
+    | null
+    | undefined,
+  t: LanguageContextValue["t"],
+  lang: Lang,
+): {
+  place: string;
+  contributor: string;
+  time: string;
+  servings: string;
+  note: string;
+} {
+  const title = recipe ? localizedTitles(recipe, lang).primary : "";
+
+  return {
+    place: recipe?.place?.trim() || t("recipe.unknownPlace"),
+    contributor: recipe?.contributor?.trim() || t("recipe.unknownContributor"),
+    time: recipe?.time?.trim() || t("recipe.defaultTime"),
+    servings: recipe?.servings?.trim() || t("recipe.defaultServings"),
+    note: recipe?.note?.trim() || t("recipe.note", { title }),
+  };
 }
 
 const KM_MONTHS = [

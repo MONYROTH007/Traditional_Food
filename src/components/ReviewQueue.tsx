@@ -165,9 +165,10 @@ export function ReviewQueue({ initialEntries }: ReviewQueueProps) {
                     <div className="mt-1.5 flex items-start gap-1.5 text-[11px] text-muted-foreground">
                       <User className="h-3.5 w-3.5 text-accent shrink-0 mt-0.5" />
                       <span>
-                        អ្នករួមចំណែក:{" "}
+                        {t("common.contributedBy")}:{" "}
                         <strong className="text-foreground font-medium">
-                          {entry.source || "Community Contributor"}
+                          {entry.source?.trim() ||
+                            t("recipe.communityContributor")}
                         </strong>
                       </span>
                     </div>

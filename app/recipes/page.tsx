@@ -59,15 +59,18 @@ export default function RecipesPage() {
       const matchesCategory =
         selectedCategory === "All" || r.category === selectedCategory;
 
+      // Search real stored content only. `note` is a generated description,
+      // not data, so it is no longer searched; the English ingredient
+      // translation is, so an English query still finds Khmer entries.
       const q = searchQuery.trim().toLowerCase();
       const matchesQuery =
         !q ||
         r.name.toLowerCase().includes(q) ||
         r.khmer.toLowerCase().includes(q) ||
-        r.note.toLowerCase().includes(q) ||
-        r.place.toLowerCase().includes(q) ||
+        (r.place ?? "").toLowerCase().includes(q) ||
         r.category.toLowerCase().includes(q) ||
-        r.ingredients.some((ing) => ing.toLowerCase().includes(q));
+        r.ingredients.some((ing) => ing.toLowerCase().includes(q)) ||
+        (r.ingredientsEn ?? []).some((ing) => ing.toLowerCase().includes(q));
 
       return matchesCategory && matchesQuery;
     });

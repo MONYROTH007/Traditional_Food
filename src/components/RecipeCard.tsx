@@ -29,6 +29,7 @@ import {
   categoryLabel,
   localizedBody,
   localizedTitles,
+  recipeMeta,
   useLanguage,
 } from "@/lib/i18n";
 import { createClient } from "@/utils/supabase/client";
@@ -48,6 +49,7 @@ export function RecipeCard({
 
   const { primary, secondary } = localizedTitles(recipe, lang);
   const { ingredients, instructions } = localizedBody(recipe, lang);
+  const meta = recipeMeta(recipe, t, lang);
 
   useEffect(() => {
     const supabase = createClient();
@@ -116,31 +118,29 @@ export function RecipeCard({
             {primary}
           </h3>
           <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
-            {recipe.note}
+            {meta.note}
           </p>
 
           <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-1 border-t border-border pt-3 text-xs uppercase tracking-[0.14em] text-muted-foreground">
             <div>
               <dt className="inline">{t("common.from")} </dt>
-              <dd className="inline text-foreground">{recipe.place}</dd>
+              <dd className="inline text-foreground">{meta.place}</dd>
             </div>
             <div>
               <dt className="inline">{t("common.time")} </dt>
-              <dd className="inline text-foreground">{recipe.time}</dd>
+              <dd className="inline text-foreground">{meta.time}</dd>
             </div>
           </dl>
 
-          {recipe.contributor && (
-            <div className="mt-2.5 flex items-center gap-1.5 text-xs text-muted-foreground">
-              <User className="h-3.5 w-3.5 text-accent shrink-0" />
-              <span className="font-medium text-foreground">
-                {t("common.contributedBy")}:
-              </span>
-              <span className="truncate italic text-foreground/90">
-                {recipe.contributor}
-              </span>
-            </div>
-          )}
+          <div className="mt-2.5 flex items-center gap-1.5 text-xs text-muted-foreground">
+            <User className="h-3.5 w-3.5 text-accent shrink-0" />
+            <span className="font-medium text-foreground">
+              {t("common.contributedBy")}:
+            </span>
+            <span className="truncate italic text-foreground/90">
+              {meta.contributor}
+            </span>
+          </div>
 
           <div className="mt-4 flex items-center justify-between border-t border-border/50 pt-2 text-xs font-medium text-primary">
             <span className="uppercase tracking-wider">
@@ -180,30 +180,22 @@ export function RecipeCard({
             <div className="flex flex-wrap items-center gap-4 border-b border-border pb-4 text-xs uppercase tracking-wider text-muted-foreground">
               <span className="flex items-center gap-1">
                 <MapPin className="h-3.5 w-3.5 text-accent" />
-                {recipe.place}
+                {meta.place}
               </span>
               <span>•</span>
               <span className="flex items-center gap-1">
                 <Clock className="h-3.5 w-3.5 text-accent" />
-                {recipe.time}
+                {meta.time}
               </span>
-              {recipe.servings && (
-                <>
-                  <span>•</span>
-                  <span>{recipe.servings}</span>
-                </>
-              )}
-              {recipe.contributor && (
-                <>
-                  <span>•</span>
-                  <span className="flex items-center gap-1 text-foreground font-medium">
-                    <User className="h-3.5 w-3.5 text-accent" />
-                    <span>
-                      {t("common.contributedBy")}: {recipe.contributor}
-                    </span>
-                  </span>
-                </>
-              )}
+              <span>•</span>
+              <span>{meta.servings}</span>
+              <span>•</span>
+              <span className="flex items-center gap-1 text-foreground font-medium">
+                <User className="h-3.5 w-3.5 text-accent" />
+                <span>
+                  {t("common.contributedBy")}: {meta.contributor}
+                </span>
+              </span>
               <Badge variant="secondary" className="ml-auto">
                 {categoryLabel(t, recipe.category)}
               </Badge>
@@ -211,7 +203,7 @@ export function RecipeCard({
 
             {/* Note / Description */}
             <p className="text-sm leading-relaxed italic text-muted-foreground">
-              &ldquo;{recipe.note}&rdquo;
+              &ldquo;{meta.note}&rdquo;
             </p>
 
             {/* Ingredients */}

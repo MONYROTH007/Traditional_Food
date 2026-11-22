@@ -272,12 +272,15 @@ export default function ContributePage() {
       const stepsTrimmed = steps.trim();
       const stepsEnTrimmed = stepsEn.trim();
       const sourceTrimmed = source.trim();
+      // Fall back to the account name, but never to a hard-coded English
+      // label: storing one would freeze it into the data and show it to Khmer
+      // readers. null lets the UI localize the fallback at render time.
       const contributorName =
         sourceTrimmed ||
         user.user_metadata?.["full_name"] ||
         user.user_metadata?.["username"] ||
         user.email?.split("@")[0] ||
-        "Community Contributor";
+        null;
 
       // Note: do NOT send status; database default sets it to 'pending'
       const baseRow = {
