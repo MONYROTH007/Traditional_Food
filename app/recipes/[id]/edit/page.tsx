@@ -45,6 +45,40 @@ type FieldErrors = {
   photo?: string | undefined;
 };
 
+/**
+ * Fields in the order they appear in the form. Used to jump to the first
+ * invalid one: validation errors render inline beside their field, so on a
+ * long form a failure near the top is invisible to someone looking at the
+ * submit button a thousand pixels below — it reads as "nothing happened".
+ */
+const FIELD_ORDER = [
+  "title",
+  "title_en",
+  "ingredients",
+  "ingredients_en",
+  "steps",
+  "steps_en",
+  "source",
+  "source_en",
+  "photo",
+] as const;
+
+function focusFirstError(errs: FieldErrors) {
+  const key = FIELD_ORDER.find((k) => errs[k]);
+  if (!key) return;
+  const el = document.getElementById(key);
+  if (!el) return;
+  // The photo input is visually hidden, so scroll its drop zone instead.
+  const target = key === "photo" ? (el.closest("div") ?? el) : el;
+  target.scrollIntoView({ behavior: "smooth", block: "center" });
+  if (key !== "photo") {
+    window.setTimeout(
+      () => (el as HTMLElement).focus({ preventScroll: true }),
+      300,
+    );
+  }
+}
+
 export default function EditRecipePage({
   params,
 }: {
@@ -193,7 +227,7 @@ export default function EditRecipePage({
     setPhotoPreview(URL.createObjectURL(file));
   };
 
-  const validateForm = (): boolean => {
+  const validateForm = (): FieldErrors => {
     const newErrors: FieldErrors = {};
 
     // 1. title: required, trimmed, 2-120 characters, must contain Khmer script
@@ -270,7 +304,7 @@ export default function EditRecipePage({
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return newErrors;
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -287,7 +321,11 @@ export default function EditRecipePage({
       return;
     }
 
-    if (!validateForm()) {
+    const fieldErrors = validateForm();
+    if (Object.keys(fieldErrors).length > 0) {
+      // Say something at the button, then take them to the offending field.
+      setGeneralErrorKey("form.fixErrors");
+      focusFirstError(fieldErrors);
       return;
     }
 

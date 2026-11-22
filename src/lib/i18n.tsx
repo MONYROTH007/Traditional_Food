@@ -227,6 +227,8 @@ const en = {
   "form.sourceEnHint":
     "English version of the credit, shown to readers using the site in English (max 150 characters).",
   "form.errSourceEnLength": "English source must be 150 characters or less.",
+  "form.fixErrors":
+    "Some fields still need attention — the first one has been highlighted above.",
   "form.photoLabel": "Dish Photo",
   "form.photoOptionalLabel": "Dish Photo (optional to update)",
   "form.photoSelect": "Click to select a photo of the dish",
@@ -543,6 +545,8 @@ const km = {
   "form.sourceEnHint":
     "ការបកប្រែប្រភពជាភាសាអង់គ្លេស សម្រាប់អ្នកអានជាភាសាអង់គ្លេស (អតិបរមា 150 តួអក្សរ)។",
   "form.errSourceEnLength": "ប្រភពជាភាសាអង់គ្លេសត្រូវតិចជាង ឬស្មើ 150 តួអក្សរ។",
+  "form.fixErrors":
+    "មានប្រអប់ខ្លះត្រូវការកែតម្រូវ — ប្រអប់ទីមួយត្រូវបានបង្ហាញខាងលើ។",
   "form.photoLabel": "រូបភាពម្ហូប",
   "form.photoOptionalLabel": "រូបភាពម្ហូប (ស្រេចចិត្តក្នុងការកែ)",
   "form.photoSelect": "ចុចដើម្បីជ្រើសរើសរូបភាពម្ហូប",
